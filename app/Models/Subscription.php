@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Subscription extends Model
 {
@@ -32,6 +33,16 @@ class Subscription extends Model
     public function member(): BelongsTo
     {
         return $this->belongsTo(Members::class, 'member_id');
+    }
+
+    /**
+     * Get all of the checkins for the Subscription
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function checkins(): HasMany
+    {
+        return $this->hasMany(CheckIns::class, 'subscription_id');
     }
 
     /**
@@ -129,3 +140,17 @@ class Subscription extends Model
         return $query->where('endDate', '<=', now());
     }
 }
+/**
+ * $pendingSubscriptions = Subscription::pending()->get();
+ * $activeSubscriptions = Subscription::active()->get();
+ * $expiredSubscriptions = Subscription::expired()->get();
+ */
+
+/**
+ * // Get active subscriptions for a specific member
+ * $memberActiveSubscriptions = Subscription::active()->where('member_id', $memberId)->get();
+ * Count expired subscriptions for a specific plan
+ * $expiredCount = Subscription::expired()->where('membership_plan_id', $planId)->count();
+ * Paginate pending subscriptions
+ * $pendingSubscriptions = Subscription::pending()->paginate(15);
+ */

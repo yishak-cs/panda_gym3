@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Members;
+use App\Models\QRcodes;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use App\Models\MembershipPlan;
-use App\Models\QRcodes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -35,7 +36,6 @@ class MembersController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the incoming request data
         $request->validate([
             'firstname' => 'required',
             'lastname' => 'required',
@@ -43,47 +43,40 @@ class MembersController extends Controller
             'phone_number' => 'required',
             'sex' => 'required',
             'membership_plan' => 'required',
+            'startDate' => 'required|date',
         ]);
 
-        // Extract member information from the request
-        $memberinfo = $request->only([
-            'firstname',
-            'lastname',
-            'email',
-            'phone_number',
-            'sex',
-            'current_weight',
-            'target_weight',
-            'goal',
-        ]);
+        try {
+            DB::transaction(function () use ($request) {
+                // Create new member
+                $memberInfo = $request->only([
+                    'firstname',
+                    'lastname',
+                    'email',
+                    'phone_number',
+                    'sex',
+                    'current_weight',
+                    'target_weight',
+                    'goal',
+                ]);
 
-        // Check if the member already exists and has a subscription
-        $member = Members::where('email', $memberinfo['email'])->first();
-        if ($member && Subscription::where('member_id', $member->id)->exists()) {
-            return redirect()->back()->with('error', 'Member already exists');
-        }
+                $newMember = Members::create($memberInfo);
 
-        // Create new member and subscription
-        $newMember = Members::create($memberinfo);
-        if ($newMember) {
-            // Create new subscription
-            $subscription = new Subscription([
-                'member_id' => $newMember->id,
-                'membership_plan_id' => $request->membership_plan,
-                'startDate' =>  Carbon::parse($request->startDate),
-            ]);
+                // Create subscription using new instance first
+                $subscription = new Subscription([
+                    'member_id' => $newMember->id,
+                    'membership_plan_id' => $request->membership_plan,
+                    'startDate' => Carbon::parse($request->startDate),
+                ]);
 
-            /**
-             * Now you can do date operations easily
-             *   $daysLeft = $subscription->endDate->diffInDays(now());
-             */
+                // Load the membership_plan relationship before saving
+                // This ensures the relationship is available for endDate calculation
+                $subscription->membership_plan = MembershipPlan::findOrFail($request->membership_plan);
+                $subscription->save();
 
-            if ($subscription->save()) {
-                // Generate QR code data
+                // Generate QR code with just the member ID
                 $qrCodeData = json_encode([
                     'id' => $newMember->id,
-                    'name' => $newMember->getName(),
-                    'membership_plan' => $newMember->subscriptions->membership_plan_id,
                 ]);
 
                 $qrCode = QrCode::format('svg')->generate($qrCodeData);
@@ -91,16 +84,19 @@ class MembersController extends Controller
 
                 Storage::disk('public')->put($qrCodePath, $qrCode);
 
-                // Store QR code information in database
+                // Store QR code information
                 QRcodes::create([
                     'member_id' => $newMember->id,
                     'path' => $qrCodePath,
                 ]);
+            });
 
-                return redirect()->route('Members-list')->with('success', 'Member added successfully');
-            }
+            return redirect()->route('Members-list')->with('success', 'Member added successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to add member: ' . $e->getMessage())
+                ->withInput();
         }
-        return redirect()->back()->with('error', 'Failed to add member');
     }
 
     /**

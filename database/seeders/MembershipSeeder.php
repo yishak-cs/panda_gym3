@@ -18,6 +18,7 @@ class MembershipSeeder extends Seeder
             'name' => 'Basic',
             'duration' => 30,
             'price' => 100,
+            'description' => 'this is trial',
         ]);
     }
 }

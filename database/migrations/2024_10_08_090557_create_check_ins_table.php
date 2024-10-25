@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('check_ins', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->constrained(table: 'members');
+            $table->foreignId('member_id')->constrained(table: 'members')->cascadeOnDelete();
+            $table->foreignId('subscription_id')->constrained(table: 'subscriptions');
             $table->timestamp('in_time', 0);
             $table->date('date');
             $table->enum('status', ['success', 'failed']);

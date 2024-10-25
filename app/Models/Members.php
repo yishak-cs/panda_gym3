@@ -34,9 +34,9 @@ class Members extends Model
      *
      * @return HasOne
      */
-    public function subscriptions(): HasOne
+    public function subscriptions(): HasMany
     {
-        return $this->hasOne(Subscription::class, 'member_id');
+        return $this->hasMany(Subscription::class, 'member_id');
     }
 
     /**
@@ -93,5 +93,49 @@ class Members extends Model
             $name .= " " . $this->lastname;
         }
         return $name;
+    }
+    /**
+     * get the user's active subscription
+     *
+     * @return Subscription|null
+     */
+    public function activeSubscription(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->active()
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Checks if the member can check in based on their active subscription.
+     * 
+     * This method first checks if the member has an active subscription. If not, it returns false.
+     * If the subscription has a limited number of allowed entries, it counts the number of check-ins
+     * for the current subscription and compares it to the allowed entries. If the count exceeds
+     * the allowed entries, it returns false. Otherwise, it returns true, indicating the member can check in.
+     * 
+     * @return boolean True if the member can check in, false otherwise.
+     */
+    public function canCheckIn()
+    {
+        $subscription = $this->activeSubscription();
+
+        if (!$subscription) {
+            return false;
+        }
+
+        // If allowed_entries is not null, check the count
+        if ($subscription->membershipPlan->allowed_entries !== null) {
+            $checkInsCount = $this->checkins()
+                ->where('subscription_id', $subscription->id)
+                ->count();
+
+            if ($checkInsCount >= $subscription->membershipPlan->allowed_entries) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

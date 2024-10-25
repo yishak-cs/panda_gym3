@@ -19,7 +19,7 @@ class MembershipPlan extends Model
         'duration',
         'price',
         'allowed_entries',
-        'description'
+        'description',
     ];
 
     /**
@@ -29,6 +29,6 @@ class MembershipPlan extends Model
      */
     public function subscription(): HasMany
     {
-        return $this->hasMany(Subscription::class, 'foreign_key', 'local_key');
+        return $this->hasMany(Subscription::class, 'membership_plan_id');
     }
 }

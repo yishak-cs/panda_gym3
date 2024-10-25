@@ -18,6 +18,7 @@ class CheckIns extends Model
         'member_id',
         'in_time',
         'date',
+        'subscription_id',
         'status',
     ];
 
@@ -29,5 +30,16 @@ class CheckIns extends Model
     public function member(): BelongsTo
     {
         return $this->belongsTo(Members::class, 'member_id');
+    }
+
+    /**
+     * Get the subscription the member used to checkin
+     * 
+     * @return  \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+
+    public function susbscription(): BelongsTo
+    {
+        return $this->belongsTo(Subscription::class, 'subscription_id');
     }
 }
