@@ -77,10 +77,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/members/{id}', [MembersController::class, 'apiShow']);
         Route::put('/members/{id}', [MembersController::class, 'apiUpdate']);
     });
-    Route::prefix('/membership-plans')->group(function () {
-        Route::get('/add', [MembershipPlanController::class, 'add'])->name('Membership_plans-add');
-        Route::post('/add', [MembershipPlanController::class, 'store'])->name('Membership_plans-store');
-        Route::get('/list', [MembershipPlanController::class, 'list'])->name('Membership_plans-list');
+
+    Route::get('/plans', [MembershipPlanController::class, 'list'])->name('plans');
+    Route::prefix('/plans')->group(function () {
+        Route::post('/add', [MembershipPlanController::class, 'store'])->name('Membership_plans.store');
         Route::delete('/delete/{id}', [MembershipPlanController::class, 'destroy'])->name('membership_plans.destroy');
         Route::get('/show/{id}', [MembershipPlanController::class, 'show'])->name('membership_plans.show');
         Route::get('/edit/{id}', [MembershipPlanController::class, 'edit'])->name('membership_plans.edit');

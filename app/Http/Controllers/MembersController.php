@@ -88,7 +88,7 @@ class MembersController extends Controller
                 ]);
             });
 
-            return redirect()->route('Members-list')->with('success', 'Member added successfully');
+            return redirect()->back()->with('success', 'Member added successfully');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to add member: ' . $e->getMessage())

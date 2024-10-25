@@ -28,21 +28,10 @@
       ]
     },
     {
+      "url": "/plans",
       "name": "Membership Plan",
       "icon": "menu-icon tf-icons ri-file-text-line",
-      "slug": "Membership_plans",
-      "submenu": [
-        {
-          "url": "/membership-plans/add",
-          "name": "Add",
-          "slug": "Membership_plans-add"
-        },
-        {
-          "url": "/membership-plans/list",
-          "name": "List",
-          "slug": "Membership_plans-list"
-        }
-      ]
+      "slug": "plans"
     },
     {
       "name": "Front Pages",

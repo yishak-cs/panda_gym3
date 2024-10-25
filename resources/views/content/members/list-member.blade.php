@@ -11,95 +11,100 @@
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="container-xxl flex-grow-1 container-p-y">
-            <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Members /</span> List
-            </h4>
-            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-                <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header bg-success text-white">
-                        <strong class="me-auto">Success</strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        Member updated successfully!
-                    </div>
+    <div class="row">
+        <div class="col-xl">
+            <div class="card mb-6">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Members List</h5>
                 </div>
-            </div>
-            @if (session('error') || session('success'))
-                <div class="card mb-4" id="alertCard">
-                    <div class="card-body">
-                        @if (session('error'))
-                            <div class="alert alert-danger alert-dismissible" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
-                                    onclick="dismissAlertCard()"></button>
+                <div class="container-xxl flex-grow-1 container-p-y">
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header bg-success text-white">
+                                <strong class="me-auto">Success</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                    aria-label="Close"></button>
                             </div>
-                        @endif
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
-                                    onclick="dismissAlertCard()"></button>
+                            <div class="toast-body">
+                                Member updated successfully!
                             </div>
-                        @endif
+                        </div>
                     </div>
-                </div>
-            @endif
+                    @if (session('error') || session('success'))
+                        <div class="card mb-4" id="alertCard">
+                            <div class="card-body">
+                                @if (session('error'))
+                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                        {{ session('error') }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                                            onclick="dismissAlertCard()"></button>
+                                    </div>
+                                @endif
+                                @if (session('success'))
+                                    <div class="alert alert-success alert-dismissible" role="alert">
+                                        {{ session('success') }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                                            onclick="dismissAlertCard()"></button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
-            <div class="table-responsive text-nowrap">
-                <!-- DataTable with Buttons -->
-                <div class="card">
-                    <div class="card-datatable table-responsive">
-                        <table class="datatables-members table border-top" id="membersTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Membership Plan</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($members as $member)
-                                    <tr>
-                                        <td>{{ $member->id }}</td>
-                                        <td>{{ $member->getName() }}</td>
-                                        <td>{{ $member->email }}</td>
-                                        <td>{{ $member->sex }}</td>
-                                        <td>
-                                            <div class="d-inline-block">
-                                                <a href="{{ route('members.show', $member->id) }}"
-                                                    class="btn rounded-pill btn-outline-info btn-sm">
-                                                    <i class="tf-icons ri-information-line me-1"></i> Info
-                                                </a>
-                                                <button type="button"
-                                                    class="btn rounded-pill btn-outline-primary btn-sm edit-user-btn"
-                                                    data-user-id="{{ $member->id }}">
-                                                    <i class="tf-icons ri-edit-line me-1"></i> Edit
-                                                </button>
-                                                <form action="{{ route('members.destroy', $member->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="btn rounded-pill btn-outline-danger btn-sm">
-                                                        <i class="tf-icons ri-delete-bin-line me-1"></i> Delete
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="table-responsive text-nowrap">
+                        <!-- DataTable with Buttons -->
+                        <div class="card">
+                            <div class="card-datatable table-responsive">
+                                <table class="datatables-members table border-top" id="membersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Membership Plan</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($members as $member)
+                                            <tr>
+                                                <td>{{ $member->id }}</td>
+                                                <td>{{ $member->getName() }}</td>
+                                                <td>{{ $member->email }}</td>
+                                                <td>{{ $member->sex }}</td>
+                                                <td>
+                                                    <div class="d-inline-block">
+                                                        <a href="{{ route('members.show', $member->id) }}"
+                                                            class="btn rounded-pill btn-outline-info btn-sm">
+                                                            <i class="tf-icons ri-information-line me-1"></i> Info
+                                                        </a>
+                                                        <button type="button"
+                                                            class="btn rounded-pill btn-outline-primary btn-sm edit-user-btn"
+                                                            data-user-id="{{ $member->id }}">
+                                                            <i class="tf-icons ri-edit-line me-1"></i> Edit
+                                                        </button>
+                                                        <form action="{{ route('members.destroy', $member->id) }}"
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit"
+                                                                class="btn rounded-pill btn-outline-danger btn-sm">
+                                                                <i class="tf-icons ri-delete-bin-line me-1"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!--/ DataTable with Buttons -->
             </div>
         </div>
-        <!--/ DataTable with Buttons -->
     </div>
 
     <!-- Add this at the end of your content section -->

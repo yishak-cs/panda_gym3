@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\MembershipPlan;
 
 class MembershipPlanController extends Controller
 {
     //
-    public function add()
+    public function list()
     {
-        return view('content.membership-plans.add-membership-plan');
+        $plans = MembershipPlan::all();
+        return view('content.membership-plans.membership-plan', ['plans' => $plans]);
     }
     /**
      * Store a newly created resource in storage.
