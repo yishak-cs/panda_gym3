@@ -69,9 +69,6 @@ class MembersController extends Controller
                     'startDate' => Carbon::parse($request->startDate),
                 ]);
 
-                // Load the membership_plan relationship before saving
-                // This ensures the relationship is available for endDate calculation
-                $subscription->membership_plan = MembershipPlan::findOrFail($request->membership_plan);
                 $subscription->save();
 
                 // Generate QR code with just the member ID
