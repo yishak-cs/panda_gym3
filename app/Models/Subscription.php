@@ -87,7 +87,35 @@ class Subscription extends Model
      */
     protected function calculateEndDate(): Carbon
     {
-        return $this->startDate->addDays($this->membership_plan->duration);
+        return $this->startDate->copy()->addDays($this->membership_plan->duration);
+    }
+    protected function calculateEndDateOnUpdate(): Carbon
+    {
+        return Carbon::parse($this->startDate)->copy()->addDays($this->membership_plan->duration);
+    }
+
+    /**
+     * Update end dates for all affected subscriptions when plan duration changes
+     * @param int $planId
+     * @return void
+     */
+    public static function updateEndDatesForPlanChange(int $planId): void
+    {
+        // Only update pending and active subscriptions
+        self::query()
+            ->where('membership_plan_id', $planId)
+            ->where(function ($query) {
+                $query->pending()
+                    ->orWhere(function ($q) {
+                        $q->active();
+                    });
+            })
+            ->chunk(100, function ($subscriptions) {
+                foreach ($subscriptions as $subscription) {
+                    $subscription->endDate = $subscription->calculateEndDateOnUpdate();
+                    $subscription->save();
+                }
+            });
     }
 
     /**

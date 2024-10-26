@@ -81,9 +81,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/plans', [MembershipPlanController::class, 'list'])->name('plans');
     Route::prefix('/plans')->group(function () {
         Route::post('/add', [MembershipPlanController::class, 'store'])->name('Membership_plans.store');
-        Route::delete('/delete/{id}', [MembershipPlanController::class, 'destroy'])->name('membership_plans.destroy');
-        Route::get('/show/{id}', [MembershipPlanController::class, 'show'])->name('membership_plans.show');
-        Route::get('/edit/{id}', [MembershipPlanController::class, 'edit'])->name('membership_plans.edit');
+        Route::delete('/delete/{plan}', [MembershipPlanController::class, 'destroy'])->name('membership_plans.destroy');
+        Route::Post('/edit/{plan}', [MembershipPlanController::class, 'edit'])->name('membership_plans.edit');
     });
 });
 

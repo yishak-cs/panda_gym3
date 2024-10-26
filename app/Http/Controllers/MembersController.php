@@ -118,6 +118,7 @@ class MembersController extends Controller
         $member = Members::find($id);
         return view('content.members.show-member', compact('member'));
     }
+
     /**
      * Display the details of a member.
      *
@@ -130,6 +131,7 @@ class MembersController extends Controller
         $member->delete();
         return redirect()->route('Members-list')->with('success', 'Member deleted successfully');
     }
+
     /**
      * Display the form for editing a member.
      *

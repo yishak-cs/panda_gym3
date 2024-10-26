@@ -22,6 +22,16 @@ class MembershipPlan extends Model
         'description',
     ];
 
+    // update the endDate of all the pending and active subscriptions of subscribers of this plan
+    protected static function booted()
+    {
+        static::updated(function ($plan) {
+            if ($plan->isDirty('duration')) {
+                Subscription::updateEndDatesForPlanChange($plan->id);
+            }
+        });
+    }
+
     /**
      * Get all of the subscription for the MembershipPlan
      *
