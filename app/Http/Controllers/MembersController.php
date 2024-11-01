@@ -103,7 +103,7 @@ class MembersController extends Controller
      */
     public function list()
     {
-        $members = Members::all();
+        $members = Members::get();
         return view('content.members.list-member', compact('members'));
     }
 

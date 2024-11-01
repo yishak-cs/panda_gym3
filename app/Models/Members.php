@@ -108,6 +108,32 @@ class Members extends Model
     }
 
     /**
+     * get the user's active subscription as an attribute 
+     * this is needed for members/list view
+     *
+     * @return Subscription|null
+     */
+    public function getActiveSubscriptionAttribute()
+    {
+        return $this->subscriptions()
+            ->active()
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * get the user's pending subscription
+     * this is needed for members/list view
+     * @return Subscription|null
+     */
+    public function getPendingSubscriptionAttribute()
+    {
+        return $this->subscriptions()
+            ->pending()
+            ->latest()
+            ->first();
+    }
+    /**
      * Checks if the member can check in based on their active subscription.
      * 
      * This method first checks if the member has an active subscription. If not, it returns false.

@@ -30,26 +30,22 @@
                             </div>
                         </div>
                     </div>
-                    @if (session('error') || session('success'))
-                        <div class="card mb-4" id="alertCard">
-                            <div class="card-body">
-                                @if (session('error'))
-                                    <div class="alert alert-danger alert-dismissible" role="alert">
-                                        {{ session('error') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
-                                            onclick="dismissAlertCard()"></button>
-                                    </div>
-                                @endif
-                                @if (session('success'))
-                                    <div class="alert alert-success alert-dismissible" role="alert">
-                                        {{ session('success') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
-                                            onclick="dismissAlertCard()"></button>
-                                    </div>
-                                @endif
+                    <div class="card-body">
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+                    </div>
 
                     <div class="table-responsive text-nowrap">
                         <!-- DataTable with Buttons -->
@@ -71,7 +67,8 @@
                                                 <td>{{ $member->id }}</td>
                                                 <td>{{ $member->getName() }}</td>
                                                 <td>{{ $member->email }}</td>
-                                                <td>{{ $member->sex }}</td>
+                                                <td>{{ $member->active_subscription ? $member->active_subscription->membership_plan->name : $member->pending_subscription?->membership_plan->name }}
+                                                </td>
                                                 <td>
                                                     <div class="d-inline-block">
                                                         <a href="{{ route('members.show', $member->id) }}"

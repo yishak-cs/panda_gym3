@@ -56,7 +56,8 @@
                                 </div>
                                 <div class="input-group input-group-merge mb-3">
                                     <span class="input-group-text"><i class="ri-calendar-line ri-20px"></i></span>
-                                    <input type="date" name="startDate" class="form-control" placeholder="Start Date" />
+                                    <input type="date" name="startDate" class="form-control" placeholder="Start Date"
+                                        min="{{ date('Y-m-d') }}" onchange="validateStartDate(this)" />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -101,4 +102,19 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function validateStartDate(input) {
+            const selectedDate = new Date(input.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time part to compare dates only
+
+            if (selectedDate < today) {
+                input.value = ''; // Clear invalid date
+                alert('Start date cannot be in the past');
+                return false;
+            }
+            return true;
+        }
+    </script>
 @endsection

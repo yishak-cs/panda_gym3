@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\icons\RiIcons;
 use App\Http\Controllers\layouts\Blank;
 use App\Http\Controllers\layouts\Fluid;
+use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\cards\CardBasic;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\layouts\Container;
@@ -60,10 +61,9 @@ Route::post('/', [LoginBasic::class, 'login'])->name('auth.login');
 //main page
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('content.dashboard.AdminDashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     Route::post('/dashboard/logout', [LoginBasic::class, 'logout'])->name('logout');
+    Route::get('/dashboard/settings', [AdminDashboard::class, 'settings'])->name('settings');
 
     // member management routes
     Route::prefix('/members')->group(function () {
