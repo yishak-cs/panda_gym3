@@ -72,10 +72,13 @@
                             </div>
                         </div>
                     </div>
-                    @if ($sub_increase_percentage >= 0)
+                    @if ($sub_increase_percentage > 0)
                         <p class="small mb-0"><span class="h6 mb-0">{{ $sub_increase_percentage * 100 }}% Growth in
                                 Subs</span>
                             😎 this month</p>
+                    @elseif ($sub_increase_percentage == 0)
+                        <p class="small mb-0"><span class="h6 mb-0">No Change in Subs</span>
+                            😔 this month</p>
                     @else
                         <p class="small mb-0"><span class="h6 mb-0">{{ $sub_increase_percentage * -100 }}% Decrease in
                                 Subs</span>

@@ -45,7 +45,9 @@ class AdminDashboard extends Controller
         }
         $this_month_subs = Subscription::whereMonth('created_at', Carbon::now()->month)->count();
         $last_month_subs = Subscription::whereMonth('created_at', Carbon::now()->subMonth()->month)->count();
-        if ($last_month_subs == 0) {
+        if ($this_month_subs == 0 && $last_month_subs == 0) {
+            $sub_increase_percentage = 0;
+        } elseif ($last_month_subs == 0) {
             $sub_increase_percentage = 1;
         } else {
             $sub_increase_percentage = ($this_month_subs - $last_month_subs) / $last_month_subs;
