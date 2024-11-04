@@ -120,11 +120,14 @@ class AdminDashboard extends Controller
                 );
             }
         }
-
-        $revenue = 0;
-        foreach (Subscription::where()->get() as $sub) {
-            $revenue += $sub->membership_plan->price;
-        }
-        return view('content.dashboard.AdminSettings');
+        return view('content.dashboard.AdminDashboard', [
+            'Sub_count' => $Sub_count
+        ]);
     }
 }
+
+/**  $revenue = 0;
+ *   foreach (Subscription::where()->get() as $sub) {
+ *   $revenue += $sub->membership_plan->price;
+ *         } 
+ */
