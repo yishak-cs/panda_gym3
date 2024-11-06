@@ -34,7 +34,7 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Membership Plans</h5>
                                 <button class="btn btn-link" id="toggleTable">
-                                    <i class="fa fa-chevron-down" id="toggleIcon"></i>
+                                    <i class="ri-arrow-down-s-line"></i>
                                 </button>
                             </div>
                             <div class="card-datatable table-responsive" id="tableContainer" style="display: none;">
