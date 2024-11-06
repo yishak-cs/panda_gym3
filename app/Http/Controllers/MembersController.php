@@ -6,10 +6,13 @@ use App\Models\Members;
 use App\Models\QRcodes;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use App\Jobs\SendQRCodeEmail;
 use App\Models\MembershipPlan;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\MailController;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 /**
@@ -62,34 +65,34 @@ class MembersController extends Controller
 
                 $newMember = Members::create($memberInfo);
 
-                // Create subscription using new instance first
+                // Create subscription
                 $subscription = new Subscription([
                     'member_id' => $newMember->id,
                     'membership_plan_id' => $request->membership_plan,
                     'startDate' => Carbon::parse($request->startDate),
                 ]);
-
                 $subscription->save();
 
-                // Generate QR code with just the member ID
-                $qrCodeData = json_encode([
-                    'id' => $newMember->id,
-                ]);
+                // Generate QR code
+                $qrCodeData = json_encode(['id' => $newMember->id]);
+                $qrCode = QrCode::format('png')->generate($qrCodeData);
+                $qrCodePath = 'qrcodes/' . $newMember->id . '.png';
 
-                $qrCode = QrCode::format('svg')->generate($qrCodeData);
-                $qrCodePath = 'qrcodes/' . $newMember->id . '.svg';
-
+                // Store QR code file
                 Storage::disk('public')->put($qrCodePath, $qrCode);
 
-                // Store QR code information
+                // Create QR code record
                 QRcodes::create([
                     'member_id' => $newMember->id,
                     'path' => $qrCodePath,
                 ]);
+                // Dispatch email job with fresh subscription data
+                MailController::sendQRcode($subscription);
             });
 
             return redirect()->back()->with('success', 'Member added successfully');
         } catch (\Exception $e) {
+            Log::error('Member registration failed: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Failed to add member: ' . $e->getMessage())
                 ->withInput();

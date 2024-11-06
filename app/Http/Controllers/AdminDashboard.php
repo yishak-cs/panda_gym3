@@ -52,15 +52,6 @@ class AdminDashboard extends Controller
         } else {
             $sub_increase_percentage = ($this_month_subs - $last_month_subs) / $last_month_subs;
         }
-        return view('content.dashboard.AdminDashboard', [
-            'bestSellingPlan' => $bestSellingPlan,
-            'stat_counts' => $stat_counts,
-            'sub_increase_percentage' => $sub_increase_percentage
-        ]);
-    }
-
-    public function settings()
-    {
         /**
          * week dates
          *
@@ -121,8 +112,16 @@ class AdminDashboard extends Controller
             }
         }
         return view('content.dashboard.AdminDashboard', [
+            'bestSellingPlan' => $bestSellingPlan,
+            'stat_counts' => $stat_counts,
+            'sub_increase_percentage' => $sub_increase_percentage,
             'Sub_count' => $Sub_count
         ]);
+    }
+
+    public function settings()
+    {
+        return view('content.dashboard.AdminDashboard', []);
     }
 }
 

@@ -11,7 +11,7 @@
 @endsection
 
 @section('page-script')
-    @vite('resources/assets/js/dashboards-analytics.js')
+    @vite('resources/assets/js/dashboards.js')
 @endsection
 
 @section('content')
@@ -137,8 +137,17 @@
                 </div>
             </div>
         </div>
-        <div>
-
+        <div class="card-body pt-lg-2">
+            <div id="totalProfitLineChart" class="mb-3"></div>
+            <div class="mt-1 mt-md-3">
+                <div class="d-flex align-items-center gap-4">
+                    <h4 class="mb-0">45%</h4>
+                    <p class="mb-0">Your sales performance is 45% 😎 better compared to last month</p>
+                </div>
+                <div class="d-grid mt-3 mt-md-4">
+                    <button class="btn btn-primary" type="button">Details</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
