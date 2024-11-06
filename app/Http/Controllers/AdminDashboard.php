@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use App\Models\Members;
 use App\Models\CheckIns;
 use App\Models\Subscription;
-use Illuminate\Http\Request;
 use App\Models\MembershipPlan;
 
 class AdminDashboard extends Controller
@@ -45,13 +44,10 @@ class AdminDashboard extends Controller
         }
         $this_month_subs = Subscription::whereMonth('created_at', Carbon::now()->month)->count();
         $last_month_subs = Subscription::whereMonth('created_at', Carbon::now()->subMonth()->month)->count();
-        if ($this_month_subs == 0 && $last_month_subs == 0) {
-            $sub_increase_percentage = 0;
-        } elseif ($last_month_subs == 0) {
-            $sub_increase_percentage = 1;
-        } else {
-            $sub_increase_percentage = ($this_month_subs - $last_month_subs) / $last_month_subs;
-        }
+        // Calculate the percentage of current month's revenue compared to last month
+        $sub_increase_percentage = $last_month_subs > 0
+            ? ($this_month_subs - $last_month_subs) / $last_month_subs
+            : ($this_month_subs == 0 && $last_month_subs == 0 ? 0 : 1);
         /**
          * week dates
          *
@@ -111,17 +107,52 @@ class AdminDashboard extends Controller
                 );
             }
         }
+        // Calculate last month's total revenue
+        $last_month_revenue = Subscription::whereMonth('created_at', Carbon::now()->subMonth()->month)
+            ->with('membership_plan')
+            ->get()
+            ->sum(function ($subscription) {
+                return $subscription->membership_plan->price;
+            });
+
+        // Calculate current month's revenue so far
+        $current_month_revenue = Subscription::whereMonth('created_at', Carbon::now()->month)
+            ->with('membership_plan')
+            ->get()
+            ->sum(function ($subscription) {
+                return $subscription->membership_plan->price;
+            });
+
+        // Calculate the percentage of current month's revenue compared to last month
+        $revenue_percentage = $last_month_revenue > 0
+            ? ($current_month_revenue / $last_month_revenue) * 100
+            : 0;
+
         return view('content.dashboard.AdminDashboard', [
             'bestSellingPlan' => $bestSellingPlan,
             'stat_counts' => $stat_counts,
             'sub_increase_percentage' => $sub_increase_percentage,
-            'Sub_count' => $Sub_count
+            'Sub_count' => $Sub_count,
+            'revenue_percentage' => $revenue_percentage
         ]);
     }
 
     public function settings()
     {
         return view('content.dashboard.AdminDashboard', []);
+    }
+
+    public function revenue()
+    {
+        $revenue = [];
+        $membership_plan = MembershipPlan::with('subscription')->get();
+        foreach ($membership_plan as $plan) {
+            $revenue[$plan->name] = count(Subscription::where('membership_plan_id', $plan->id)->get());
+        }
+        return view('content.settings.settings', [
+            'membership' => $membership_plan,
+            'revenue' => $revenue
+        ]);
     }
 }
 

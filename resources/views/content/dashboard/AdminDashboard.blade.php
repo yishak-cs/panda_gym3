@@ -12,6 +12,77 @@
 
 @section('page-script')
     @vite('resources/assets/js/dashboards.js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const subCountData = @json($Sub_count);
+
+            const currentMonthData = Object.values(subCountData.this_month)
+                .flatMap(week => Object.values(week));
+            const lastMonthData = Object.values(subCountData.last_month)
+                .flatMap(week => Object.values(week));
+            console.log(lastMonthData);
+            const days = Object.values(subCountData.this_month)
+                .flatMap(week => Object.keys(week));
+
+            const totalProfitLineChartEl = document.querySelector('#totalProfitLineChart');
+            const totalProfitLineChartConfig = {
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    },
+                    toolbar: {
+                        show: true
+                    }
+                },
+                series: [{
+                    name: 'Current Month',
+                    data: currentMonthData
+                }, {
+                    name: 'Last Month',
+                    data: lastMonthData
+                }],
+                xaxis: {
+
+                    labels: {
+                        show: false
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: 'Number of Subscriptions'
+                    }
+                },
+                colors: ['#ab2f2b', '#478d93'],
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+                legend: {
+                    position: 'top'
+                },
+                markers: {
+                    size: 4,
+                    hover: {
+                        size: 6
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(value) {
+                            return value + ' subscriptions';
+                        }
+                    }
+                }
+            };
+
+            if (typeof totalProfitLineChartEl !== undefined && totalProfitLineChartEl !== null) {
+                const totalProfitLineChart = new ApexCharts(totalProfitLineChartEl, totalProfitLineChartConfig);
+                totalProfitLineChart.render();
+            }
+        });
+    </script>
 @endsection
 
 @section('content')
@@ -39,8 +110,7 @@
                         </div>
 
                         <div class="mt-3">
-                            <p class="mb-2">{{ $bestSellingPlan['percentage'] * 100 }}% of Total Subs</p>
-                            <a href="javascript:;" class="btn btn-sm btn-primary">View Sales</a>
+                            <p class="mb-2">{{ round($bestSellingPlan['percentage'] * 100, 0) }}% of Total Subs</p>
                         </div>
 
                         <img src="{{ asset('assets/img/illustrations/trophy.png') }}"
@@ -141,8 +211,10 @@
             <div id="totalProfitLineChart" class="mb-3"></div>
             <div class="mt-1 mt-md-3">
                 <div class="d-flex align-items-center gap-4">
-                    <h4 class="mb-0">45%</h4>
-                    <p class="mb-0">Your sales performance is 45% 😎 better compared to last month</p>
+
+                    <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is {{ $revenue_percentage }}% of Last
+                            month's Revenue</span>
+                    </p>
                 </div>
                 <div class="d-grid mt-3 mt-md-4">
                     <button class="btn btn-primary" type="button">Details</button>

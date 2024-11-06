@@ -63,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     Route::post('/dashboard/logout', [LoginBasic::class, 'logout'])->name('logout');
-    Route::get('/dashboard/settings', [AdminDashboard::class, 'settings'])->name('settings');
+    Route::get('/dashboard/settings', [AdminDashboard::class, 'revenue'])->name('settings');
 
     // member management routes
     Route::prefix('/members')->group(function () {
