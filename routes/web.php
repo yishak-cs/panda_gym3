@@ -7,6 +7,7 @@ use App\Http\Controllers\layouts\Fluid;
 use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\cards\CardBasic;
 use App\Http\Controllers\pages\MiscError;
+use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\layouts\Container;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\dashboard\Analytics;
@@ -84,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/delete/{plan}', [MembershipPlanController::class, 'destroy'])->name('membership_plans.destroy');
         Route::Post('/edit/{plan}', [MembershipPlanController::class, 'edit'])->name('membership_plans.edit');
     });
+    Route::get('/checkin/{payload}', [CheckinController::class, 'processScan'])->name('Checkin');
 });
 
 
