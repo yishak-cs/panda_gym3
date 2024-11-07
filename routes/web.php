@@ -85,7 +85,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/delete/{plan}', [MembershipPlanController::class, 'destroy'])->name('membership_plans.destroy');
         Route::Post('/edit/{plan}', [MembershipPlanController::class, 'edit'])->name('membership_plans.edit');
     });
-    Route::get('/checkin/{payload}', [CheckinController::class, 'processScan'])->name('Checkin');
+    Route::get('/checkin/{member_id}/{subscription_id}/{membership_name}/{end_date}/{timestamp}', [CheckinController::class, 'processScan'])->name('Checkin');
 });
 
 

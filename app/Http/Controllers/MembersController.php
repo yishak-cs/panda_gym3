@@ -6,12 +6,10 @@ use App\Models\Members;
 use App\Models\QRcodes;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
-use App\DTO\GymAccessPayload;
 use App\Models\MembershipPlan;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\MailController;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -74,22 +72,16 @@ class MembersController extends Controller
                 ]);
                 $subscription->save();
 
-                $payload = new GymAccessPayload(
-                    memberId: $newMember->id,
-                    subscriptionId: $subscription->id,
-                    membershipName: $subscription->membership_plan->name,
-                    endDate: $subscription->endDate,
-                    timestamp: now()
-                );
-
-                $encryptedPayload = Crypt::encrypt($payload);
-
-                $url = route('Checkin', ['payload' => $encryptedPayload]);
+                $url = route('Checkin', [
+                    'member_id' => $newMember->id,
+                    'subscription_id' => $subscription->id,
+                    'membership_name' => $subscription->membership_plan->name,
+                    'end_date' => $subscription->endDate,
+                    'timestamp' => now(),
+                ]);
 
                 // Generate QR code
-                $qrCode = QrCode::size(300)
-                    ->errorCorrection('H')
-                    ->generate($url);
+                $qrCode = QrCode::format('png')->size(300)->generate($url);
                 $qrCodePath = 'qrcodes/' . $newMember->id . '.png';
 
                 // Store QR code file
