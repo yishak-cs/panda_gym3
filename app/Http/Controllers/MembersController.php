@@ -7,7 +7,6 @@ use App\Models\QRcodes;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use App\DTO\GymAccessPayload;
-use App\Jobs\SendQRCodeEmail;
 use App\Models\MembershipPlan;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
