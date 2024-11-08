@@ -72,13 +72,7 @@ class MembersController extends Controller
                 ]);
                 $subscription->save();
 
-                $url = route('Checkin', [
-                    'member_id' => $newMember->id,
-                    'subscription_id' => $subscription->id,
-                    'membership_name' => $subscription->membership_plan->name,
-                    'end_date' => $subscription->endDate,
-                    'timestamp' => now(),
-                ]);
+                $url = route('Checkin', ['member_id' => $newMember->id]);
 
                 // Generate QR code
                 $qrCode = QrCode::format('png')->size(300)->generate($url);

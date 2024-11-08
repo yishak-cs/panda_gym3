@@ -11,7 +11,6 @@
 @endsection
 
 @section('page-script')
-    @vite('resources/assets/js/dashboards.js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const subCountData = @json($Sub_count);

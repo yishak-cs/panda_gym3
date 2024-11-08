@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+use function PHPUnit\Framework\isNull;
+
 class Members extends Model
 {
     use HasFactory;
@@ -152,10 +154,9 @@ class Members extends Model
         }
 
         // If allowed_entries is not null, check the count
-        if ($subscription->membershipPlan->allowed_entries !== null) {
-            $checkInsCount = $this->checkins()
-                ->where('subscription_id', $subscription->id)
-                ->count();
+        if (!is_null($subscription->membership_plan->allowed_entries)) {
+            $checkInsCount = count($this->checkins()
+                ->where('subscription_id', $subscription->id));
 
             if ($checkInsCount >= $subscription->membershipPlan->allowed_entries) {
                 return false;

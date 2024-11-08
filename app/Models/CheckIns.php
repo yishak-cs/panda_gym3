@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,7 +17,7 @@ class CheckIns extends Model
      */
     protected $fillable = [
         'member_id',
-        'in_time',
+        'in_times',
         'date',
         'subscription_id',
         'status',
@@ -41,5 +42,15 @@ class CheckIns extends Model
     public function susbscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class, 'subscription_id');
+    }
+
+    /**
+     * Get the checkin times for the checkin
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function checkInTimes(): HasMany
+    {
+        return $this->hasMany(CheckInTimes::class, 'checkin_id');
     }
 }

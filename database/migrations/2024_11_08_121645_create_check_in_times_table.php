@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('check_ins', function (Blueprint $table) {
+        Schema::create('check_in_times', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->constrained(table: 'members')->cascadeOnDelete();
-            $table->foreignId('subscription_id')->constrained(table: 'subscriptions');
-            $table->integer('in_times');
-            $table->date('date');
-            $table->enum('status', ['success', 'failed']);
+            $table->foreignId('checkin_id')->constrained('check_ins')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('check_ins');
+        Schema::dropIfExists('check_in_times');
     }
 };
