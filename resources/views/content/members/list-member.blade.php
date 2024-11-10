@@ -67,7 +67,7 @@
                                                 <td>{{ $member->id }}</td>
                                                 <td>{{ $member->getName() }}</td>
                                                 <td>{{ $member->email }}</td>
-                                                <td>{{ $member->active_subscription ? $member->active_subscription->membership_plan->name : $member->pending_subscription?->membership_plan->name }}
+                                                <td>{{ $member->active_subscription->membership_plan->name ?? $member->pending_subscription?->membership_plan->name }}
                                                 </td>
                                                 <td>
                                                     <div class="d-inline-block">

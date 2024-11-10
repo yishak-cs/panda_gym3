@@ -102,9 +102,12 @@
                     $days = collect($period);
                 @endphp
 
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="h5 mb-0">Check-in Calendar</h3>
+                <div class="card mt-4 {{ $subscription->endDate->isPast() ? 'bg-secondary' : '' }}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 {{ $subscription->endDate->isPast() ? 'text-white' : '' }}">Check-in Calendar</h5>
+                        @if ($subscription->endDate->isPast())
+                            <small class="text-white float-end">This Member's Subscription has Expired</small>
+                        @endif
                     </div>
                     <div class="card-body">
                         <div class="checkin-calendar">
@@ -113,6 +116,9 @@
                                     $hasCheckin = isset($checkinData[$day->format('Y-m-d')]);
                                     $checkinCount = $hasCheckin ? $checkinData[$day->format('Y-m-d')]['count'] : 0;
                                     $bgClass = $hasCheckin ? 'bg-primary' : 'bg-secondary';
+                                    if ($subscription->endDate->isPast()) {
+                                        $bgClass = $hasCheckin ? 'bg-info' : 'bg-danger';
+                                    }
 
                                     // Format the tooltip content
                                     $tooltipDate = $day->format('M d, Y');
