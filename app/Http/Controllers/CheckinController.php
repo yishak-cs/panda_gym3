@@ -31,6 +31,10 @@ class CheckinController extends Controller
             ]);
 
             if ($checkin->save()) {
+                $checkInTime = new CheckInTimes([
+                    'checkin_id' => $checkin->id,
+                ]);
+                $checkInTime->save();
                 return redirect()->route('members.show', ['id' => $member_id])->with('success', 'Check-in successful.');
             }
         }

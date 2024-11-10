@@ -118,8 +118,45 @@ class MembersController extends Controller
      */
     public function show($id)
     {
-        $member = Members::find($id);
-        return view('content.members.show-member', compact('member'));
+        // Eager load relationships to avoid N+1 queries
+        $member = Members::findOrFail($id);
+
+        // Get subscription (active, pending, or expired)
+        $subscription = $member->active_subscription
+            ?? $member->pending_subscription
+            ?? $member->subscriptions()->expired()->latest()->first();
+
+        if (!$subscription) {
+            return redirect()->back()->with('error', 'No subscription found for this member');
+        }
+
+        // Prepare check-in data for the contribution graph
+        $checkinData = $member->checkins()
+            ->where('subscription_id', $subscription->id)
+            ->get()
+            ->groupBy(function ($checkin) {
+                return Carbon::parse($checkin->date)->format('Y-m-d');
+            })
+            ->map(function ($dayCheckins) {
+                return [
+                    'count' => $dayCheckins->sum('in_times'),
+                    'times' => $dayCheckins->flatMap(function ($checkin) {
+                        return $checkin->checkInTimes->pluck('created_at')
+                            ->map(fn($time) => $time->format('H:i'));
+                    })->toArray()
+                ];
+            });
+
+        $count_check = $member->checkins()
+            ->where('subscription_id', $subscription->id)
+            ->sum('in_times');
+
+        return view('content.members.show-member', compact(
+            'member',
+            'subscription',
+            'checkinData',
+            'count_check'
+        ));
     }
 
     /**
