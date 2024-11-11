@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Members;
 use App\Models\CheckIns;
+use App\Models\CheckInTimes;
 use App\Models\Subscription;
 use App\Models\MembershipPlan;
 
@@ -126,7 +127,7 @@ class AdminDashboard extends Controller
         // Calculate the percentage of current month's revenue compared to last month
         $revenue_percentage = $last_month_revenue > 0
             ? ($current_month_revenue / $last_month_revenue) * 100
-            : 0;
+            : 100;
 
         return view('content.dashboard.AdminDashboard', [
             'bestSellingPlan' => $bestSellingPlan,
@@ -149,9 +150,77 @@ class AdminDashboard extends Controller
         foreach ($membership_plan as $plan) {
             $revenue[$plan->name] = count(Subscription::where('membership_plan_id', $plan->id)->get());
         }
+
+        // Initialize an associative array for monthly revenue
+        $monthlyRevenue = [
+            'Jan' => 0,
+            'Feb' => 0,
+            'Mar' => 0,
+            'Apr' => 0,
+            'May' => 0,
+            'Jun' => 0,
+            'Jul' => 0,
+            'Aug' => 0,
+            'Sep' => 0,
+            'Oct' => 0,
+            'Nov' => 0,
+            'Dec' => 0
+        ];
+
+        // Fetch all subscriptions for the current year
+        $yearlyData = Subscription::whereYear('created_at', Carbon::now()->year)->with('membership_plan')->get();
+
+        // Calculate revenue for each month
+        foreach ($yearlyData as $subscription) {
+            $month = $subscription->created_at->format('M');
+            $monthlyRevenue[$month] += $subscription->membership_plan->price;
+        }
+
+        // Calculate last month's total revenue
+        $last_month_revenue = Subscription::whereMonth('created_at', Carbon::now()->subMonth()->month)
+            ->with('membership_plan')
+            ->get()
+            ->sum(function ($subscription) {
+                return $subscription->membership_plan->price;
+            });
+
+        // Calculate current month's revenue so far
+        $current_month_revenue = Subscription::whereMonth('created_at', Carbon::now()->month)
+            ->with('membership_plan')
+            ->get()
+            ->sum(function ($subscription) {
+                return $subscription->membership_plan->price;
+            });
+
+        // Calculate the percentage of current month's revenue compared to last month
+        $revenue_percentage = $last_month_revenue > 0
+            ? ($current_month_revenue / $last_month_revenue) * 100
+            : 100;
+        $HourData = array_fill(5, 19, 0); // Initialize hours 5 to 23 with zero counts
+
+        $checkin_times = CheckInTimes::get();
+
+        foreach ($checkin_times as $checkin_time) {
+            $hour = $checkin_time->created_at->hour;
+            $minute = $checkin_time->created_at->minute;
+
+            // Determine the hour bucket based on minutes
+            if ($minute >= 31) {
+                $hour += 1;
+            }
+
+            // Only count hours between 5 and 23
+            if ($hour >= 5 && $hour <= 23) {
+                $HourData[$hour]++;
+            }
+        }
+
         return view('content.settings.settings', [
             'membership' => $membership_plan,
-            'revenue' => $revenue
+            'revenue' => $revenue,
+            'monthlyRevenue' => $monthlyRevenue, // Pass monthly revenue to the view
+            'revenue_percentage' => $revenue_percentage,
+            'HourData' => $HourData
         ]);
     }
 }

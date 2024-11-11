@@ -2,10 +2,15 @@
 
 @section('title', 'Membership Plans - Revenue')
 
-@section('style-sheet')
+@section('vendor-style')
+    @vite('resources/assets/vendor/libs/apex-charts/apex-charts.scss')
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/fh-4.0.1/r-3.0.3/sc-2.4.3/sb-1.8.1/sp-2.3.3/datatables.min.css"
         rel="stylesheet">
+@endsection
+
+@section('vendor-script')
+    @vite('resources/assets/vendor/libs/apex-charts/apexcharts.js')
 @endsection
 
 @section('content')
@@ -73,6 +78,78 @@
             </div>
         </div>
     </div>
+    <div class="row gy-6">
+        <!-- yearly Overview Chart -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="mb-1">Yearly Revenue Overview</h5>
+                        <div class="dropdown">
+                            <button class="btn text-muted p-0" type="button" id="YearlyOverviewDropdown"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="ri-more-2-line ri-24px"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="YearlyOverviewDropdown">
+                                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body pt-lg-2">
+                    <div id="RevenueReportChart"></div>
+                    <div class="mt-1 mt-md-3">
+                        <div class="d-flex align-items-center gap-4">
+                            <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is {{ $revenue_percentage }}%
+                                    of
+                                    Last
+                                    month's Revenue</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of yearly Overview Chart -->
+        <!-- checkintimes scatter chart -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="mb-1">Check-ins Time Distribution</h5>
+                        <div class="dropdown">
+                            <button class="btn text-muted p-0" type="button" id="YearlyOverviewDropdown"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="ri-more-2-line ri-24px"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="YearlyOverviewDropdown">
+                                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body pt-lg-2">
+                    <div id="CheckinsReportChart"></div>
+                    <div class="mt-1 mt-md-3">
+                        <div class="d-flex align-items-center gap-4">
+                            <p class="small mb-0"><span class="h6 mb-0">This month's Checkins is {{ '14' }}%
+                                    of
+                                    Last
+                                    month's Checkins</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end ofcheckintimes scatter chart -->
+    </div>
 @endsection
 
 @section('page-script')
@@ -81,11 +158,235 @@
 
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/fh-4.0.1/r-3.0.3/sc-2.4.3/sb-1.8.1/sp-2.3.3/datatables.min.js">
     </script>
-
     <script>
         document.getElementById('toggleTable').addEventListener('click', function() {
             const tableContainer = document.getElementById('tableContainer');
             tableContainer.style.display = tableContainer.style.display === 'none' ? 'block' : 'none';
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartBgColor = '#f8f9fa';
+            const borderColor = '#f0f0f0';
+            const labelColor = '#6c757d';
+            const primaryColor = '#696cff';
+
+            const RevenueReportChartEl = document.querySelector('#RevenueReportChart');
+            const RevenueReportChartConfig = {
+                chart: {
+                    type: 'bar',
+                    height: 300,
+                    offsetY: -9,
+                    offsetX: -16,
+                    parentHeightOffset: 0,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                series: [{
+                    name: 'Sales',
+                    data: [
+                        {{ $monthlyRevenue['Jan'] }},
+                        {{ $monthlyRevenue['Feb'] }},
+                        {{ $monthlyRevenue['Mar'] }},
+                        {{ $monthlyRevenue['Apr'] }},
+                        {{ $monthlyRevenue['May'] }},
+                        {{ $monthlyRevenue['Jun'] }},
+                        {{ $monthlyRevenue['Jul'] }},
+                        {{ $monthlyRevenue['Aug'] }},
+                        {{ $monthlyRevenue['Sep'] }},
+                        {{ $monthlyRevenue['Oct'] }},
+                        {{ $monthlyRevenue['Nov'] }},
+                        {{ $monthlyRevenue['Dec'] }}
+                    ]
+                }],
+                colors: ['#ab2f2b'],
+                plotOptions: {
+                    bar: {
+                        borderRadius: 10,
+                        columnWidth: '30%',
+                        endingShape: 'rounded',
+                        startingShape: 'rounded',
+                        colors: {
+                            ranges: {
+                                color: primaryColor
+                            }
+
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    show: false
+                },
+                grid: {
+                    strokeDashArray: 8,
+                    borderColor,
+                    padding: {
+                        bottom: -10
+                    }
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
+                        'Dec'
+                    ],
+                    tickPlacement: 'on',
+                    labels: {
+                        show: false
+                    },
+                    axisBorder: {
+                        show: false
+                    },
+                    axisTicks: {
+                        show: false
+                    },
+                    crosshairs: {
+                        opacity: 0
+                    }
+                },
+                yaxis: {
+                    show: true,
+                    tickAmount: 3,
+                    labels: {
+                        formatter: function(val) {
+                            return parseInt(val) + ' birr';
+                        },
+                        style: {
+                            fontSize: '13px',
+                            fontFamily: 'Inter',
+                            colors: labelColor
+                        }
+                    }
+                },
+                states: {
+                    hover: {
+                        filter: {
+                            type: 'none'
+                        }
+                    },
+                    active: {
+                        filter: {
+                            type: 'none'
+                        }
+                    }
+                },
+                responsive: [{
+                        breakpoint: 1500,
+                        options: {
+                            plotOptions: {
+                                bar: {
+                                    columnWidth: '40%'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        breakpoint: 1200,
+                        options: {
+                            plotOptions: {
+                                bar: {
+                                    columnWidth: '30%'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        breakpoint: 815,
+                        options: {
+                            plotOptions: {
+                                bar: {
+                                    borderRadius: 5
+                                }
+                            }
+                        }
+                    },
+                    {
+                        breakpoint: 768,
+                        options: {
+                            plotOptions: {
+                                bar: {
+                                    borderRadius: 10,
+                                    columnWidth: '20%'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        breakpoint: 568,
+                        options: {
+                            plotOptions: {
+                                bar: {
+                                    borderRadius: 8,
+                                    columnWidth: '30%'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        breakpoint: 410,
+                        options: {
+                            plotOptions: {
+                                bar: {
+                                    columnWidth: '50%'
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+
+            if (typeof RevenueReportChartEl !== undefined && RevenueReportChartEl !== null) {
+                const RevenueReportChart = new ApexCharts(RevenueReportChartEl, RevenueReportChartConfig);
+                RevenueReportChart.render();
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Assuming HourData is passed to the view as a JSON object
+            var hourData = @json($HourData);
+
+            var seriesData = Object.keys(hourData).map(function(hour) {
+                return {
+                    x: hour,
+                    y: hourData[hour],
+                    z: hourData[hour] // You can adjust 'z' to represent another dimension if needed
+                };
+            });
+
+            var options = {
+                series: [{
+                    name: 'Check-ins',
+                    data: seriesData
+                }],
+                chart: {
+                    height: 300,
+                    type: 'bubble',
+                    toolbar: {
+                        show: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                fill: {
+                    opacity: 0.8
+                },
+                xaxis: {
+                    tickAmount: 19, // Number of hours from 5 to 23
+                    type: 'category',
+                    categories: Object.keys(hourData) // Use hour keys as categories
+                },
+                yaxis: {
+                    max: Math.max(...Object.values(hourData)) + 5 // Adjust max based on data
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#CheckinsReportChart"), options);
+            chart.render();
         });
     </script>
 @endsection
