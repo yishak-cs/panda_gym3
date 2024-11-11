@@ -13,7 +13,7 @@ class CheckinController extends Controller
     {
         $member = Members::find($member_id);
         if (!$member->canCheckIn()) {
-            return redirect()->back()->with('error', 'You have reached the maximum number of entries for this membership.');
+            return redirect()->back()->with('error', 'Either You have reached the maximum number of entries for this membership or the Start Date is not due');
         }
 
         $todayCheckin = $member->checkins()->whereDate('date', Carbon::today())->first();

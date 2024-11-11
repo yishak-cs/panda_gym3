@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Members;
-use App\Models\CheckIns;
 use App\Models\CheckInTimes;
 use App\Models\Subscription;
 use App\Models\MembershipPlan;
@@ -15,7 +14,7 @@ class AdminDashboard extends Controller
     public function index()
     {
         $members_count = Members::count();
-        $checkins_count = CheckIns::count();
+        $checkins_count = CheckInTimes::count();
         $membership_count = MembershipPlan::count();
         $stat_counts = [
             'MembershipPlans' => $membership_count,
@@ -215,12 +214,17 @@ class AdminDashboard extends Controller
             }
         }
 
+        $current_month_checkin = count(CheckInTimes::whereMonth('created_at', Carbon::now()->month)->get());
+        $last_month_checkin = count(CheckInTimes::whereMonth('created_at', Carbon::now()->subMonth()->month)->get());
+        $checkinPercentage = $last_month_checkin > 0 ?
+            ($current_month_checkin / $last_month_checkin) * 100 : 100;
         return view('content.settings.settings', [
             'membership' => $membership_plan,
             'revenue' => $revenue,
             'monthlyRevenue' => $monthlyRevenue, // Pass monthly revenue to the view
             'revenue_percentage' => $revenue_percentage,
-            'HourData' => $HourData
+            'HourData' => $HourData,
+            'checkinPercentage' => $checkinPercentage
         ]);
     }
 }

@@ -130,26 +130,18 @@
                 <div class="card-header">
                     <div class="d-flex align-items-center justify-content-between">
                         <h5 class="card-title m-0 me-2">Stats</h5>
-                        <div class="dropdown">
-                            <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-more-2-line ri-24px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
-                                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Update</a>
-                            </div>
-                        </div>
                     </div>
                     @if ($sub_increase_percentage > 0)
-                        <p class="small mb-0"><span class="h6 mb-0">{{ $sub_increase_percentage * 100 }}% Growth in
+                        <p class="small mb-0"><span class="h6 mb-0">{{ round($sub_increase_percentage * 100, 0) }}% Growth
+                                in
                                 Subs</span>
                             😎 this month</p>
                     @elseif ($sub_increase_percentage == 0)
                         <p class="small mb-0"><span class="h6 mb-0">No Change in Subs</span>
                             😔 this month</p>
                     @else
-                        <p class="small mb-0"><span class="h6 mb-0">{{ $sub_increase_percentage * -100 }}% Decrease in
+                        <p class="small mb-0"><span class="h6 mb-0">{{ round($sub_increase_percentage * -100, 0) }}% Decrease
+                                in
                                 Subs</span>
                             😔 this month</p>
                     @endif
@@ -211,7 +203,8 @@
             <div class="mt-1 mt-md-3">
                 <div class="d-flex align-items-center gap-4">
 
-                    <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is {{ $revenue_percentage }}% of Last
+                    <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is
+                            {{ round($revenue_percentage, 2) }}% of Last
                             month's Revenue</span>
                     </p>
                 </div>

@@ -85,17 +85,6 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5 class="mb-1">Yearly Revenue Overview</h5>
-                        <div class="dropdown">
-                            <button class="btn text-muted p-0" type="button" id="YearlyOverviewDropdown"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-more-2-line ri-24px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="YearlyOverviewDropdown">
-                                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Update</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -103,7 +92,8 @@
                     <div id="RevenueReportChart"></div>
                     <div class="mt-1 mt-md-3">
                         <div class="d-flex align-items-center gap-4">
-                            <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is {{ $revenue_percentage }}%
+                            <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is
+                                    {{ round($revenue_percentage, 2) }}%
                                     of
                                     Last
                                     month's Revenue</span>
@@ -114,23 +104,12 @@
             </div>
         </div>
         <!-- End of yearly Overview Chart -->
-        <!-- checkintimes scatter chart -->
+        <!-- checkintimes bubble chart -->
         <div class="col-xl-4 col-md-6">
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5 class="mb-1">Check-ins Time Distribution</h5>
-                        <div class="dropdown">
-                            <button class="btn text-muted p-0" type="button" id="YearlyOverviewDropdown"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-more-2-line ri-24px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="YearlyOverviewDropdown">
-                                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Share</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Update</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -138,7 +117,7 @@
                     <div id="CheckinsReportChart"></div>
                     <div class="mt-1 mt-md-3">
                         <div class="d-flex align-items-center gap-4">
-                            <p class="small mb-0"><span class="h6 mb-0">This month's Checkins is {{ '14' }}%
+                            <p class="small mb-0"><span class="h6 mb-0">This month's Checkins is {{ $checkinPercentage }}%
                                     of
                                     Last
                                     month's Checkins</span>
@@ -148,7 +127,29 @@
                 </div>
             </div>
         </div>
-        <!-- end ofcheckintimes scatter chart -->
+        <!-- end of checkintimes bubble chart -->
+
+        <!-- Membership Revenue contribution -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="mb-1">Yearly Revenue Overview</h5>
+                    </div>
+                </div>
+
+                <div class="card-body pt-lg-2">
+                    <div id="chart"></div>
+                    <div class="mt-1 mt-md-3">
+                        <div class="d-flex align-items-center gap-4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Membership Revenue contribution-->
+
     </div>
 @endsection
 
@@ -386,6 +387,52 @@
             };
 
             var chart = new ApexCharts(document.querySelector("#CheckinsReportChart"), options);
+            chart.render();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Assuming HourData is passed to the view as a JSON object
+            var options = {
+                series: [44, 55, 41, 17, 15],
+                chart: {
+                    height: 300,
+                    type: 'donut',
+                },
+                plotOptions: {
+                    pie: {
+                        startAngle: -90,
+                        endAngle: 270
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                fill: {
+                    type: 'gradient',
+                },
+                legend: {
+                    formatter: function(val, opts) {
+                        return val + " - " + opts.w.globals.series[opts.seriesIndex]
+                    }
+                },
+                title: {
+                    text: 'Gradient Donut with custom Start-angle'
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
             chart.render();
         });
     </script>

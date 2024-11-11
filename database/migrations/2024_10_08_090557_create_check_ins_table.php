@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('check_ins', function (Blueprint $table) {
             $table->id();
             $table->foreignId('member_id')->constrained(table: 'members')->cascadeOnDelete();
-            $table->foreignId('subscription_id')->constrained(table: 'subscriptions');
+            $table->foreignId('subscription_id')->constrained(table: 'subscriptions')->cascadeOnDelete();;
             $table->integer('in_times');
             $table->date('date');
             $table->enum('status', ['success', 'failed']);
