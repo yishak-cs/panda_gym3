@@ -64,8 +64,9 @@
                                                 <td>{{ $plan->price }}</td>
                                                 <td>{{ $plan->allowed_entries == null ? 'Unlimited' : $plan->allowed_entries }}
                                                 </td>
-                                                <td>{{ $revenue[$plan->name] }}</td>
-                                                <td>{{ $revenue[$plan->name] * (int) $plan->price }}</td>
+                                                <td>{{ $revenue[$plan->name]['sub_count'] }}</td>
+                                                <td>{{ $revenue[$plan->name]['sub_count'] * $revenue[$plan->name]['price'] }}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -392,9 +393,30 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Assuming HourData is passed to the view as a JSON object
+            // Calculate total revenue and percentages
+            const revenue = @json($revenue);
+            let totalRevenue = 0;
+            let contributionData = [];
+
+            // Calculate total revenue
+            Object.entries(revenue).forEach(([planName, data]) => {
+                totalRevenue += data.sub_count * data.price;
+            });
+
+            // Calculate percentage contributions
+            Object.entries(revenue).forEach(([planName, data]) => {
+                const planRevenue = data.sub_count * data.price;
+                const contribution = (planRevenue / totalRevenue) * 100;
+                contributionData.push({
+                    name: planName,
+                    value: parseFloat(contribution.toFixed(2))
+                });
+            });
+
+            // Chart configuration
             var options = {
-                series: [44, 55, 41, 17, 15],
+                series: contributionData.map(item => item.value),
+                labels: contributionData.map(item => item.name),
                 chart: {
                     height: 300,
                     type: 'donut',
@@ -406,18 +428,22 @@
                     }
                 },
                 dataLabels: {
-                    enabled: false
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toFixed(1) + '%';
+                    }
                 },
                 fill: {
                     type: 'gradient',
                 },
                 legend: {
                     formatter: function(val, opts) {
-                        return val + " - " + opts.w.globals.series[opts.seriesIndex]
+                        return val + " - " + opts.w.globals.series[opts.seriesIndex] + '%';
                     }
                 },
                 title: {
-                    text: 'Gradient Donut with custom Start-angle'
+                    text: 'Membership Plan Revenue Distribution',
+                    align: 'center'
                 },
                 responsive: [{
                     breakpoint: 480,

@@ -147,7 +147,10 @@ class AdminDashboard extends Controller
         $revenue = [];
         $membership_plan = MembershipPlan::with('subscription')->get();
         foreach ($membership_plan as $plan) {
-            $revenue[$plan->name] = count(Subscription::where('membership_plan_id', $plan->id)->get());
+            $revenue[$plan->name] = [
+                'sub_count' => count(Subscription::where('membership_plan_id', $plan->id)->get()),
+                'price' => $plan->price
+            ];
         }
 
         // Initialize an associative array for monthly revenue
