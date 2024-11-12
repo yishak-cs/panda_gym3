@@ -3,13 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-use function PHPUnit\Framework\isNull;
 
 class Members extends Model
 {
@@ -51,15 +48,6 @@ class Members extends Model
         return $this->hasOne(QRcodes::class, 'member_id');
     }
 
-    /**
-     * The notifications sent to the Member
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function notifications(): BelongsToMany
-    {
-        return $this->belongsToMany(Notification::class, 'member_notification', 'member_id', 'notification_id');
-    }
 
     /**
      * Get all of the checkins for the Members
@@ -71,15 +59,6 @@ class Members extends Model
         return $this->hasMany(CheckIns::class, 'member_id');
     }
 
-    /**
-     * Get all of the renewals for the Members
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function renewals(): HasMany
-    {
-        return $this->hasMany(MembershipRenewal::class, 'member_id');
-    }
     /**
      * return the members full name
      *
