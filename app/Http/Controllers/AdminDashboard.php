@@ -200,7 +200,12 @@ class AdminDashboard extends Controller
             : 100;
         $HourData = array_fill(5, 19, 0); // Initialize hours 5 to 23 with zero counts
 
-        $checkin_times = CheckInTimes::get();
+        // Calculate start date (3 months ago from start of current month)
+        $startDate = Carbon::now()->startOfMonth()->subMonths(3);
+        // Calculate end date (end of current month)
+        $endDate = Carbon::now()->endOfMonth();
+
+        $checkin_times = CheckInTimes::whereBetween('created_at', [$startDate, $endDate])->get();
 
         foreach ($checkin_times as $checkin_time) {
             $hour = $checkin_time->created_at->hour;

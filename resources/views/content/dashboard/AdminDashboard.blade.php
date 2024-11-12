@@ -140,7 +140,8 @@
                         <p class="small mb-0"><span class="h6 mb-0">No Change in Subs</span>
                             😔 this month</p>
                     @else
-                        <p class="small mb-0"><span class="h6 mb-0">{{ round($sub_increase_percentage * -100, 0) }}% Decrease
+                        <p class="small mb-0"><span class="h6 mb-0">{{ round($sub_increase_percentage * -100, 0) }}%
+                                Decrease
                                 in
                                 Subs</span>
                             😔 this month</p>

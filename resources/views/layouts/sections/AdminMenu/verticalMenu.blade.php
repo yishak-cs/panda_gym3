@@ -2,7 +2,7 @@
 
     <!-- ! Hide app brand if navbar-full -->
     <div class="app-brand demo">
-        <a href="{{ url('/') }}" class="app-brand-link">
+        <a href="{{ url('/dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo me-1">
                 @include('_partials.macros')
             </span>
@@ -67,7 +67,7 @@
 
                     {{-- submenu --}}
                     @isset($menu->submenu)
-                        @include('layouts.sections.menu.submenu', ['menu' => $menu->submenu])
+                        @include('layouts.sections.AdminMenu.submenu', ['menu' => $menu->submenu])
                     @endisset
                 </li>
             @endif
