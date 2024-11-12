@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminDashboard;
+use App\Http\Controllers\authentications\ForgotPasswordBasic;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MembershipPlanController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\authentications\LoginBasic;
 Route::get('/', function () {
     return view('content.authentications.auth-login-basic');
 })->name('login');
+Route::get('auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('forgot-password');
 
 Route::post('/', [LoginBasic::class, 'login'])->name('auth.login');
 
