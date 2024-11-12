@@ -166,6 +166,12 @@
             tableContainer.style.display = tableContainer.style.display === 'none' ? 'block' : 'none';
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = new DataTable('#membersTable');
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
