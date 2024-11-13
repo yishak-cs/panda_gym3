@@ -13,7 +13,13 @@ class AdminDashboard extends Controller
     //
     public function index()
     {
-        $members_count = Members::count();
+        $members_count = Members::whereHas('subscriptions', function ($query) {
+            $query->where(function ($query) {
+                $query->active()->orWhere(function ($query) {
+                    $query->pending();
+                });
+            });
+        })->count();
         $checkins_count = CheckInTimes::count();
         $membership_count = MembershipPlan::count();
         $stat_counts = [
