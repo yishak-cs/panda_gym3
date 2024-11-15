@@ -13,7 +13,6 @@
 
                 <!-- Logo -->
                 <div class="card p-7">
-                    <!-- Forgot Password -->
                     <!-- Logo -->
                     <div class="app-brand justify-content-center mt-5">
                         <a href="{{ url('/') }}" class="app-brand-link gap-3">
@@ -31,32 +30,47 @@
                                 {{ session('status') }}
                             </div>
                         @endif
-                        <form id="formAuthentication" class="mb-5" action="{{ route('password.email') }}" method="POST">
+                        <form id="formAuthentication" class="mb-5" action="{{ route('password.update') }}" method="POST">
                             @csrf
+                            <input type="hidden" name="token" value="{{ $token }}">
                             <div class="form-floating form-floating-outline mb-5">
                                 <input id="email" type="email"
                                     class="form-control @error('email') is-invalid @enderror" name="email"
-                                    value="{{ old('email') }}" required autocomplete="email" autofocus>
+                                    value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
-
                                 <label for="email">Email</label>
                             </div>
-                            <button type="submit" class="btn btn-primary d-grid w-100 mb-5">Send Reset Link</button>
+                            <div class="form-floating form-floating-outline mb-5">
+                                <input id="password" type="password"
+                                    class="form-control @error('password') is-invalid @enderror" name="password" required
+                                    autocomplete="new-password">
+
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                                <label for="email">Password</label>
+                            </div>
+                            <div class="form-floating form-floating-outline mb-5">
+                                <label for="password-confirm"
+                                    class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="password-confirm" type="password" class="form-control"
+                                        name="password_confirmation" required autocomplete="new-password">
+                                </div>
+                            </div>
+                            <button type="submit"
+                                class="btn btn-primary d-grid w-100 mb-5">{{ __('Reset Password') }}</button>
                         </form>
-                        <div class="text-center">
-                            <a href="{{ url('/') }}" class="d-flex align-items-center justify-content-center">
-                                <i class="ri-arrow-left-s-line ri-20px me-1_5"></i>
-                                Back to login
-                            </a>
-                        </div>
                     </div>
                 </div>
-                <!-- /Forgot Password -->
             </div>
         </div>
     </div>

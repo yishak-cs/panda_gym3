@@ -26,21 +26,32 @@
                         <h4 class="mb-1">Welcome to {{ config('variables.templateName') }}! 👋🏻</h4>
                         <p class="mb-5">Please sign-in to your account and start the adventure</p>
 
-                        <form id="formAuthentication" class="mb-5" action="{{ route('auth.login') }}" method="POST">
+                        <form id="formAuthentication" class="mb-5" action="{{ route('login') }}" method="POST">
                             @csrf
                             <div class="form-floating form-floating-outline mb-5">
-                                <input type="text" class="form-control" id="email" name="email"
-                                    placeholder="Enter your email or username" autofocus>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                    name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
                                 <label for="email">Email or Username</label>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
                             <div class="mb-5">
                                 <div class="form-password-toggle">
                                     <div class="input-group input-group-merge">
                                         <div class="form-floating form-floating-outline">
-                                            <input type="password" id="password" class="form-control" name="password"
+                                            <input type="password" id="password"
+                                                class="form-control @error('password') is-invalid @enderror" name="password"
                                                 placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                                                 aria-describedby="password" />
                                             <label for="password">Password</label>
+                                            @error('password')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </div>
                                         <span class="input-group-text cursor-pointer"><i
                                                 class="ri-eye-off-line ri-20px"></i></span>
@@ -49,12 +60,14 @@
                             </div>
                             <div class="mb-5 pb-2 d-flex justify-content-between pt-2 align-items-center">
                                 <div class="form-check mb-0">
-                                    <input class="form-check-input" type="checkbox" id="remember-me">
-                                    <label class="form-check-label" for="remember-me">
+                                    <input class="form-check-input" type="checkbox" name="remember" id="remember"
+                                        {{ old('remember') ? 'checked' : '' }}>
+
+                                    <label class="form-check-label" for="remember">
                                         Remember Me
                                     </label>
                                 </div>
-                                <a href="{{ route('forgot-password') }}" class="float-end mb-1">
+                                <a href="{{ route('password.request') }}" class="float-end mb-1">
                                     <span>Forgot Password?</span>
                                 </a>
                             </div>

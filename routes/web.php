@@ -1,19 +1,17 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminDashboard;
-use App\Http\Controllers\authentications\ForgotPasswordBasic;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MembershipPlanController;
 use App\Http\Controllers\authentications\LoginBasic;
+use App\Http\Controllers\authentications\ForgotPasswordBasic;
 
 Route::get('/', function () {
     return view('content.authentications.auth-login-basic');
-})->name('login');
-Route::get('auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('forgot-password');
-
-Route::post('/', [LoginBasic::class, 'login'])->name('auth.login');
+});
 
 //main page
 Route::middleware(['auth'])->group(function () {
@@ -43,3 +41,5 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::get('/checkin/{member_id}', [CheckinController::class, 'processScan'])->name('Checkin');
 });
+
+Auth::routes();

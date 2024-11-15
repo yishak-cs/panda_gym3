@@ -12,6 +12,7 @@
     "intervention/image": "^3.9",
     "laravel/framework": "^11.0",
     "laravel/tinker": "^2.9",
+    "laravel/ui": "^4.5",
     "simplesoftwareio/simple-qrcode": "^4.2",
     "staudenmeir/belongs-to-through": "^2.16",
     "vonage/vonage-laravel": "^1.0"
