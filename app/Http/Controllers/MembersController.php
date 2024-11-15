@@ -168,7 +168,9 @@ class MembersController extends Controller
     public function destroy($id)
     {
         $member = Members::find($id);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $member->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         return redirect()->route('Members-list')->with('success', 'Member deleted successfully');
     }
 

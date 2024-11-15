@@ -6,8 +6,6 @@ use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MembershipPlanController;
-use App\Http\Controllers\authentications\LoginBasic;
-use App\Http\Controllers\authentications\ForgotPasswordBasic;
 
 Route::get('/', function () {
     return view('content.authentications.auth-login-basic');
@@ -17,7 +15,6 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/logout', [LoginBasic::class, 'logout'])->name('logout');
     Route::get('/dashboard/settings', [AdminDashboard::class, 'revenue'])->name('settings');
 
     // member management routes

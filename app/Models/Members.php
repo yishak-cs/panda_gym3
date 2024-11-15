@@ -134,10 +134,15 @@ class Members extends Model
 
         // If allowed_entries is not null, check the count
         if (!is_null($subscription->membership_plan->allowed_entries)) {
-            $checkInsCount = count($this->checkins()
-                ->where('subscription_id', $subscription->id));
+            $checkin_times_count = 0;
+            $check_ins = $this->checkins()
+                ->where('subscription_id', $subscription->id)
+                ->get();
+            foreach ($check_ins as $check_in) {
+                $checkin_times_count += $check_in->in_times;
+            }
 
-            if ($checkInsCount >= $subscription->membershipPlan->allowed_entries) {
+            if ($checkin_times_count >= $subscription->membership_plan->allowed_entries) {
                 return false;
             }
         }
