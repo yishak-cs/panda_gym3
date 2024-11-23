@@ -46,8 +46,18 @@
         <div class="card shadow-lg">
             <!-- Header Section -->
             <div class="card-header bg-primary text-white">
-                <h2 class="h3 text-white">{{ $member->getName() }}</h2>
-                <p>Member since {{ \Carbon\Carbon::parse($subscription->startDate)->format('M Y') }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="h3 text-white mb-0">{{ $member->getName() }}</h2>
+                        <p class="mb-0">Member since {{ \Carbon\Carbon::parse($subscription->startDate)->format('M Y') }}
+                        </p>
+                    </div>
+                    <!-- QR Code Modal Trigger -->
+                    <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#qrCodeModal">
+                        <i class="bi bi-qr-code me-1"></i> View QR Code
+                    </button>
+                </div>
             </div>
             <br>
             @if (session('error'))
@@ -158,8 +168,25 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-
+    <!-- QR Code Modal -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel">{{ $member->getName() }}'s QR Code</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="{{ $subscription->member->qrCode ? asset('storage/' . $subscription->member->qrCode->path) : '' }}"
+                        alt="Member QR Code" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
