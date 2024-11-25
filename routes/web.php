@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminDashboard;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MembershipPlanController;
@@ -24,6 +25,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/list', [MembersController::class, 'list'])->name('Members-list');
         Route::delete('/delete/{id}', [MembersController::class, 'destroy'])->name('members.destroy');
         Route::get('/show/{id}', [MembersController::class, 'show'])->name('members.show');
+    });
+    Route::prefix('/users')->group(function () {
+        Route::get('/add-users', [UserController::class, 'add'])->name('Users-add');
+        Route::post('/add-users', [UserController::class, 'store'])->name('Users-store');
+        Route::get('/list', [UserController::class, 'list'])->name('Users-list');
+        Route::delete('users/delete/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
     Route::prefix('/api')->group(function () {
         Route::get('/members/{id}', [MembersController::class, 'apiShow']);

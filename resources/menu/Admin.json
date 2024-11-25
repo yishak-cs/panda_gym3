@@ -7,6 +7,23 @@
       "slug": "dashboard"
     },
     {
+      "name": "Users",
+      "icon": "menu-icon tf-icons ri-customer-service-line",
+      "slug": "Users",
+      "submenu": [
+        {
+          "url": "/users/add-users",
+          "name": "Add",
+          "slug": "Users-add"
+        },
+        {
+          "url": "/users/list",
+          "name": "List",
+          "slug": "Users-list"
+        }
+      ]
+    },
+    {
       "name": "Members",
       "icon": "menu-icon tf-icons ri-user-3-line",
       "slug": "Member",
