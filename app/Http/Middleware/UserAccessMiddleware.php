@@ -17,7 +17,7 @@ class UserAccessMiddleware
     public function handle(Request $request, Closure $next, string $role): Response
     {
         if (!Auth::check() || Auth::user()->role != $role) {
-            return redirect()->route('login');
+            return redirect()->route(Auth::user()->type + 'dashbaord')->with('error', 'You do not have permission to access this page.');
         }
         return $next($request);
     }

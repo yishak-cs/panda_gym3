@@ -1,13 +1,14 @@
 <?php
 
-use App\Models\CheckIns;
 use App\Models\Members;
-use App\Models\MembershipPlan;
+use App\Models\CheckIns;
 use App\Models\Subscription;
+use App\Models\MembershipPlan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Application;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Http\Middleware\UserAccessMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -18,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
     health: '/up',
   )
   ->withMiddleware(function (Middleware $middleware) {
-    //
+    $middleware->alias([
+      'UserAccess' => UserAccessMiddleware::class
+    ]);
   })
   ->withExceptions(function (Exceptions $exceptions) {
     //

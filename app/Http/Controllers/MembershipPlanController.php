@@ -26,7 +26,7 @@ class MembershipPlanController extends Controller
         $request->validate([
             'name' => 'string|required|unique:\App\Models\MembershipPlan,name',
             'duration' => 'integer|required',
-            'price' => 'integer|required',
+            'price' => 'numeric|required',
             'allowed_entries' => 'integer|nullable',
             'description' => 'string'
         ]);

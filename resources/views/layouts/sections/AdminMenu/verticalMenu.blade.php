@@ -3,7 +3,7 @@
     <!-- ! Hide app brand if navbar-full -->
     <div class="app-brand demo">
         <a href="{{ url('/dashboard') }}" class="app-brand-link">
-            <span class="app-brand-logo demo me-1">
+            <span class="app-brand-logo rounded-circle demo me-1" style="width: 50px; height: 50px;">
                 @include('_partials.macros')
             </span>
             <span class="app-brand-text demo menu-text fw-semibold ms-2">{{ config('variables.templateName') }}</span>

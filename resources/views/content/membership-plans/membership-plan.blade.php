@@ -12,32 +12,54 @@
                 </button>
 
                 <div class="collapse" id="collapseExample">
-                    <div class="d-grid d-sm-flex p-4 border">
+                    <div class="row justify-content-center p-4 border">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">New Membership Plan information</h5>
+                            <small class="text-danger float-end">Fields marked with * are required</small>
+                        </div>
                         <form class="p-6" action="{{ route('Membership_plans.store') }}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating form-floating-outline mb-6">
-                                        <input type="text" name="name" class="form-control"
+                                        <input type="text" name="name" id="name"
+                                            class="form-control @error('name') is-invalid @enderror"
                                             id="exampleDropdownFormName" placeholder="Enter Plan Name" required>
-                                        <label for="exampleDropdownFormName">Name</label>
+                                        <label for="exampleDropdownFormName">Name *</label>
+                                        @error('name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <div class="form-floating form-floating-outline mb-6">
-                                        <input type="number" name="duration" class="form-control"
+                                        <input type="number" name="duration" id="duration"
+                                            class="form-control @error('duration') is-invalid @enderror"
                                             id="exampleDropdownFormDuration" placeholder="In Days" required />
-                                        <label for="exampleDropdownFormDuration">Duration in Days</label>
+                                        <label for="exampleDropdownFormDuration">Duration in Days *</label>
+                                        @error('duration')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <div class="form-floating form-floating-outline mb-6">
-                                        <input type="number" name="price" class="form-control"
+                                        <input type="number" name="price" step="0.01" class="form-control"
                                             id="exampleDropdownFormPrice" placeholder="Price in ETB" required />
-                                        <label for="exampleDropdownFormPrice">Price</label>
+                                        <label for="exampleDropdownFormPrice">Price *</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating form-floating-outline mb-6">
-                                        <input type="number" name="allowed_entries" class="form-control"
+                                        <input type="number" name="allowed_entries"
+                                            class="form-control @error('allowed_entries') is-invalid @enderror"
                                             id="exampleDropdownAllowed_entries" placeholder="Allowed entries count" />
                                         <label for="exampleDropdownAllowed_entries">Allowed Entries</label>
+                                        @error('allowed_entries')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <div class="form-floating form-floating-outline mb-6">
                                         <textarea name="description" class="form-control h-px-100" id="exampleFormControlDescription"
@@ -111,12 +133,12 @@
                                     <div class="form-floating form-floating-outline mb-6">
                                         <input type="text" name="name" class="form-control"
                                             id="exampleDropdownFormName" placeholder="Enter Plan Name" required>
-                                        <label for="exampleDropdownFormName">Name</label>
+                                        <label for="exampleDropdownFormName">Name *</label>
                                     </div>
                                     <div class="form-floating form-floating-outline mb-6">
                                         <input type="number" name="duration" class="form-control"
                                             id="exampleDropdownFormDuration" placeholder="Duration in Days">
-                                        <label for="exampleDropdownFormDuration">Duration</label>
+                                        <label for="exampleDropdownFormDuration">Duration *</label>
                                     </div>
                                     <div class="form-floating form-floating-outline mb-6">
                                         <input type="number" name="allowed_entries" class="form-control"
