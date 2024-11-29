@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\MailController;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -76,10 +77,13 @@ class MembersController extends Controller
                 ]);
                 $subscription->save();
 
-                $url = route('Checkin', ['member_id' => $newMember->id]);
+                // Encrypt just the member ID
+                $encrypted = Crypt::encrypt($newMember->id);
 
-                // Generate QR code
+                // Generate QR code with encrypted member ID
+                $url = route('Checkin', ['member_id' => $encrypted]);
                 $qrCode = QrCode::format('png')->size(300)->generate($url);
+
                 $qrCodePath = 'qrcodes/' . $newMember->id . '.png';
 
                 // Store QR code file
