@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\ReceptionDashboard;
 use App\Http\Controllers\MembershipPlanController;
 
 Route::get('/', function () {
@@ -15,9 +16,13 @@ Route::get('/', function () {
 //main page
 Route::middleware(['auth'])->group(function () {
 
-    Route::middleware('UserAccess:admin')->group(function () {
-        Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+    Route::middleware(['UserAccess:admin'])->group(function () {
+        Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('admin.dashboard');
         Route::get('/dashboard/settings', [AdminDashboard::class, 'revenue'])->name('settings');
+    });
+
+    Route::middleware('UserAccess:receptionist')->group(function () {
+        Route::get('/receptionist/dashboard', [ReceptionDashboard::class, 'index'])->name('receptionist.dashboard');
     });
 
     // member management routes
@@ -43,8 +48,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/members/{id}', [MembersController::class, 'apiUpdate']);
     });
 
-    Route::get('/plans', [MembershipPlanController::class, 'list'])->name('plans');
     Route::middleware('UserAccess:admin')->group(function () {
+        Route::get('/plans', [MembershipPlanController::class, 'list'])->name('plans');
         Route::prefix('/plans')->group(function () {
             Route::post('/add', [MembershipPlanController::class, 'store'])->name('Membership_plans.store');
             Route::delete('/delete/{plan}', [MembershipPlanController::class, 'destroy'])->name('membership_plans.destroy');

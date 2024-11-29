@@ -16,7 +16,7 @@ class UserController extends Controller
      */
     public function add()
     {
-        return view('content.users.add-users');
+        return view('content.Admin.users.add-users');
     }
 
     /**
@@ -31,6 +31,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
+            'sex' => 'required',
             'role' => 'required|in:receptionist,admin',
         ]);
 
@@ -38,6 +39,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'sex' => $request->sex,
             'role' => $request->role,
         ]);
 
@@ -57,7 +59,7 @@ class UserController extends Controller
     {
         $users = User::where('id', '!=', Auth::user()->id)->get();
 
-        return view('content.users.list-users', compact('users'));
+        return view('content.Admin.users.list-users', compact('users'));
     }
 
     /**

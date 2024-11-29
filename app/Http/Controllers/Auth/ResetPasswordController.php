@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 
 class ResetPasswordController extends Controller
@@ -26,4 +27,13 @@ class ResetPasswordController extends Controller
      * @var string
      */
     protected $redirectTo = '/dashboard';
+    /**
+     * overide the redirectTo property
+     *
+     * @return void
+     */
+    public function redirectPath()
+    {
+        return Auth::user()->role == 'admin' ? '/dashboard' : '/receptionist/dashboard';
+    }
 }

@@ -80,15 +80,17 @@
                                                             data-user-id="{{ $member->id }}">
                                                             <i class="tf-icons ri-edit-line me-1"></i> Edit
                                                         </button>
-                                                        <form action="{{ route('members.destroy', $member->id) }}"
-                                                            method="POST" class="d-inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit"
-                                                                class="btn rounded-pill btn-outline-danger btn-sm">
-                                                                <i class="tf-icons ri-delete-bin-line me-1"></i> Delete
-                                                            </button>
-                                                        </form>
+                                                        @if (Auth::user()->role === 'admin')
+                                                            <form action="{{ route('members.destroy', $member->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit"
+                                                                    class="btn rounded-pill btn-outline-danger btn-sm">
+                                                                    <i class="tf-icons ri-delete-bin-line me-1"></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>

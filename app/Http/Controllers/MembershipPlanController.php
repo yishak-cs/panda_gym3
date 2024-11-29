@@ -12,7 +12,7 @@ class MembershipPlanController extends Controller
     public function list()
     {
         $plans = MembershipPlan::all();
-        return view('content.membership-plans.membership-plan', ['plans' => $plans]);
+        return view('content.Admin.membership-plans.membership-plan', ['plans' => $plans]);
     }
 
     /**
@@ -41,6 +41,12 @@ class MembershipPlanController extends Controller
 
     public function edit(MembershipPlan $plan, Request $request)
     {
+        $request->validate([
+            'name' => ['string', 'nullable', Rule::unique('membership_plans', 'name')->ignore($plan->id),],
+            'duration' => 'integer|required',
+            'allowed_entries' => 'integer|nullable',
+        ]);
+
         /**
          * check updating flag
          *
@@ -60,12 +66,6 @@ class MembershipPlanController extends Controller
         if (!$flag) {
             return redirect()->back()->with('success', 'Nothing to Update');
         }
-
-        $request->validate([
-            'name' => ['string', 'nullable', Rule::unique('membership_plans', 'name')->ignore($plan->id),],
-            'duration' => 'integer|required',
-            'allowed_entries' => 'integer|nullable',
-        ]);
 
         if ($plan->update([
             'name' => $request->get('name'),

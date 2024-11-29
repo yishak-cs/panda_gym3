@@ -55,7 +55,8 @@
         <li class="nav-item navbar-dropdown dropdown-user dropdown">
             <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
-                    <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="w-px-40 h-auto rounded-circle">
+                    <img src="{{ Auth::user()->sex === 'Male' ? asset('assets/img/avatars/3.png') : asset('assets/img/avatars/4.png') }}"
+                        alt class="w-px-40 h-auto rounded-circle">
                 </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end mt-3 py-2">
@@ -64,13 +65,13 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-shrink-0 me-2">
                                 <div class="avatar avatar-online">
-                                    <img src="{{ asset('assets/img/avatars/1.png') }}" alt
-                                        class="w-px-40 h-auto rounded-circle">
+                                    <img src="{{ Auth::user()->sex === 'Male' ? asset('assets/img/avatars/3.png') : asset('assets/img/avatars/4.png') }}"
+                                        alt class="w-px-40 h-auto rounded-circle">
                                 </div>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="mb-0 small">Panda</h6>
-                                <small class="text-muted">Admin</small>
+                                <h6 class="mb-0 small">{{ Auth::user()->name }}</h6>
+                                <small class="text-muted">{{ Auth::user()->role }}</small>
                             </div>
                         </div>
                     </a>
@@ -78,12 +79,14 @@
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
-                <li>
-                    <a class="dropdown-item" href="{{ route('settings') }}">
-                        <i class='ri-settings-4-line ri-22px me-2'></i>
-                        <span class="align-middle">Settings</span>
-                    </a>
-                </li>
+                @if (Auth::user()->role == 'admin')
+                    <li>
+                        <a class="dropdown-item" href="{{ route('settings') }}">
+                            <i class='ri-settings-4-line ri-22px me-2'></i>
+                            <span class="align-middle">Settings</span>
+                        </a>
+                    </li>
+                @endif
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>

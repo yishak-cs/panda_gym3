@@ -17,7 +17,7 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        @foreach ($adminData[0]->menu as $menu)
+        @foreach ($menuData[0]->menu as $menu)
             {{-- adding active and open class if child is active --}}
 
             {{-- menu headers --}}

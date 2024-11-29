@@ -65,6 +65,21 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="sex" class="form-label">Sex</label>
+                            <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror"
+                                required>
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            @error('sex')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
                             <label for="role" class="form-label">Role</label>
                             <select id="role" name="role" class="form-select @error('role') is-invalid @enderror"
                                 required>

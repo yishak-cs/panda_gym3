@@ -20,10 +20,10 @@ class MenuServiceProvider extends ServiceProvider
    */
   public function boot(): void
   {
-    $verticalMenuJson = file_get_contents(base_path('resources/menu/verticalMenu.json'));
-    $verticalMenuData = json_decode($verticalMenuJson);
+    $ReceptionistMenuJson = file_get_contents(base_path('resources/menu/ReceptionistMenu.json'));
+    $MenuData = json_decode($ReceptionistMenuJson);
 
     // Share all menuData to all the views
-    $this->app->make('view')->share('menuData', [$verticalMenuData]);
+    $this->app->make('view')->share('menuData', [$MenuData]);
   }
 }

@@ -1,0 +1,27 @@
+{
+  "menu": [
+    {
+      "url": "/receptionist/dashboard",
+      "name": "Dashboards",
+      "icon": "menu-icon tf-icons ri-home-smile-line",
+      "slug": "dashboard"
+    },
+    {
+      "name": "Members",
+      "icon": "menu-icon tf-icons ri-user-3-line",
+      "slug": "Member",
+      "submenu": [
+        {
+          "url": "/members/add-member",
+          "name": "Add",
+          "slug": "Members-add"
+        },
+        {
+          "url": "/members/list",
+          "name": "List",
+          "slug": "Members-list"
+        }
+      ]
+    }
+  ]
+}

@@ -64,6 +64,7 @@ class AdminDashboard extends Controller
             'week_2' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             'week_3' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             'week_4' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            'week_5' => ['Fri', 'Sat']
         ];
 
         /**
@@ -134,18 +135,13 @@ class AdminDashboard extends Controller
             ? ($current_month_revenue / $last_month_revenue) * 100
             : 100;
 
-        return view('content.dashboard.AdminDashboard', [
+        return view('content.Admin.dashboard.AdminDashboard', [
             'bestSellingPlan' => $bestSellingPlan,
             'stat_counts' => $stat_counts,
             'sub_increase_percentage' => $sub_increase_percentage,
             'Sub_count' => $Sub_count,
             'revenue_percentage' => $revenue_percentage
         ]);
-    }
-
-    public function settings()
-    {
-        return view('content.dashboard.AdminDashboard', []);
     }
 
     public function revenue()
@@ -232,7 +228,7 @@ class AdminDashboard extends Controller
         $last_month_checkin = count(CheckInTimes::whereMonth('created_at', Carbon::now()->subMonth()->month)->get());
         $checkinPercentage = $last_month_checkin > 0 ?
             ($current_month_checkin / $last_month_checkin) * 100 : 100;
-        return view('content.settings.settings', [
+        return view('content.Admin.settings.settings', [
             'membership' => $membership_plan,
             'revenue' => $revenue,
             'monthlyRevenue' => $monthlyRevenue, // Pass monthly revenue to the view

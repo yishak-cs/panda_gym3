@@ -10,6 +10,7 @@ use App\Models\MembershipPlan;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\MailController;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -27,7 +28,10 @@ class MembersController extends Controller
     public function add()
     {
         $memberships = MembershipPlan::all();
-        return view('content.members.add-member', compact('memberships'));
+        if (Auth::user()->role === 'receptionist') {
+            return view('content.Receptionist.members.add-member', compact('memberships'));
+        }
+        return view('content.Admin.members.add-member', compact('memberships'));
     }
 
     /**
@@ -107,7 +111,10 @@ class MembersController extends Controller
     public function list()
     {
         $members = Members::get();
-        return view('content.members.list-member', compact('members'));
+        if (Auth::user()->role === 'receptionist') {
+            return view('content.Receptionist.members.list-member', compact('members'));
+        }
+        return view('content.Admin.members.list-member', compact('members'));
     }
 
     /**
@@ -151,7 +158,16 @@ class MembersController extends Controller
             ->where('subscription_id', $subscription->id)
             ->sum('in_times');
 
-        return view('content.members.show-member', compact(
+
+        if (Auth::user()->role === 'receptionist') {
+            return view('content.Receptionist.members.show-member', compact(
+                'member',
+                'subscription',
+                'checkinData',
+                'count_check'
+            ));
+        }
+        return view('content.Admin.members.show-member', compact(
             'member',
             'subscription',
             'checkinData',
@@ -171,7 +187,7 @@ class MembersController extends Controller
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $member->delete();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        return redirect()->route('Members-list')->with('success', 'Member deleted successfully');
+        return redirect()->back()->with('success', 'Member deleted successfully');
     }
 
     /**
