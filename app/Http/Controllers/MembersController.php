@@ -102,7 +102,7 @@ class MembersController extends Controller
         } catch (\Exception $e) {
             Log::error('Member registration failed: ' . $e->getMessage());
             return redirect()->back()
-                ->with('error', 'Failed to add member: ' . $e->getMessage())
+                ->with('error', 'Failed to add member')
                 ->withInput();
         }
     }
