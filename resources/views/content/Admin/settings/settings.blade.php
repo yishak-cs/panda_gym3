@@ -15,63 +15,61 @@
 
 @section('content')
     <div class="row">
-        <div class="col-xl">
-            <div class="card mb-6">
-                <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="card mb-6 col-xl">
+            <div class="container-xxl flex-grow-1 container-p-y">
 
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+
+                <div class="table-responsive text-nowrap">
+                    <!-- DataTable with Buttons -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Membership Plans</h5>
+                            <button class="btn btn-link" id="toggleTable">
+                                <i class="ri-arrow-down-s-line"></i>
+                            </button>
                         </div>
-                    @endif
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-
-                    <div class="table-responsive text-nowrap">
-                        <!-- DataTable with Buttons -->
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Membership Plans</h5>
-                                <button class="btn btn-link" id="toggleTable">
-                                    <i class="ri-arrow-down-s-line"></i>
-                                </button>
-                            </div>
-                            <div class="card-datatable table-responsive" id="tableContainer" style="display: none;">
-                                <table class="datatables-members table border-top" id="membersTable">
-                                    <thead>
+                        <div class="card-datatable table-responsive" id="tableContainer" style="display: none;">
+                            <table class="datatables-members table border-top" id="membersTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Duration</th>
+                                        <th>Price</th>
+                                        <th>Allowed Entries</th>
+                                        <th>Sub Count</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($membership as $plan)
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Duration</th>
-                                            <th>Price</th>
-                                            <th>Allowed Entries</th>
-                                            <th>Sub Count</th>
-                                            <th>Revenue</th>
+                                            <td>{{ $plan->id }}</td>
+                                            <td>{{ $plan->name }}</td>
+                                            <td>{{ $plan->duration }}</td>
+                                            <td>{{ $plan->price }}</td>
+                                            <td>{{ $plan->allowed_entries == null ? 'Unlimited' : $plan->allowed_entries }}
+                                            </td>
+                                            <td>{{ $revenue[$plan->name]['sub_count'] }}</td>
+                                            <td>{{ $revenue[$plan->name]['sub_count'] * $revenue[$plan->name]['price'] }}
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($membership as $plan)
-                                            <tr>
-                                                <td>{{ $plan->id }}</td>
-                                                <td>{{ $plan->name }}</td>
-                                                <td>{{ $plan->duration }}</td>
-                                                <td>{{ $plan->price }}</td>
-                                                <td>{{ $plan->allowed_entries == null ? 'Unlimited' : $plan->allowed_entries }}
-                                                </td>
-                                                <td>{{ $revenue[$plan->name]['sub_count'] }}</td>
-                                                <td>{{ $revenue[$plan->name]['sub_count'] * $revenue[$plan->name]['price'] }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -81,28 +79,28 @@
     </div>
     <div class="row gy-6">
         <!-- yearly Overview Chart -->
-        <div class="col-xl-4 col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="mb-1">Yearly Revenue Overview</h5>
-                    </div>
-                </div>
+        <div class="card h-full col-xl-4 col-md-6">
 
-                <div class="card-body pt-lg-2">
-                    <div id="RevenueReportChart"></div>
-                    <div class="mt-1 mt-md-3">
-                        <div class="d-flex align-items-center gap-4">
-                            <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is
-                                    {{ round($revenue_percentage, 2) }}%
-                                    of
-                                    Last
-                                    month's Revenue</span>
-                            </p>
-                        </div>
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-1">Yearly Revenue Overview</h5>
+                </div>
+            </div>
+
+            <div class="card-body pt-lg-2">
+                <div id="RevenueReportChart"></div>
+                <div class="mt-1 mt-md-3">
+                    <div class="d-flex align-items-center gap-4">
+                        <p class="small mb-0"><span class="h6 mb-0">This month's Revenue is
+                                {{ round($revenue_percentage, 2) }}%
+                                of
+                                Last
+                                month's Revenue</span>
+                        </p>
                     </div>
                 </div>
             </div>
+
         </div>
         <!-- End of yearly Overview Chart -->
         <!-- checkintimes bubble chart -->
@@ -131,22 +129,15 @@
         <!-- end of checkintimes bubble chart -->
 
         <!-- Membership Revenue contribution -->
-        <div class="col-xl-4 col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="mb-1">Yearly Revenue Overview</h5>
-                    </div>
+        <div class="card col-xl-4 col-md-6">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-1">Yearly Revenue Overview</h5>
                 </div>
+            </div>
 
-                <div class="card-body pt-lg-2">
-                    <div id="chart"></div>
-                    <div class="mt-1 mt-md-3">
-                        <div class="d-flex align-items-center gap-4">
-
-                        </div>
-                    </div>
-                </div>
+            <div class="card-body pt-lg-4">
+                <div id="chart"></div>
             </div>
         </div>
         <!-- End Membership Revenue contribution-->
@@ -424,7 +415,7 @@
                 series: contributionData.map(item => item.value),
                 labels: contributionData.map(item => item.name),
                 chart: {
-                    height: 300,
+                    height: 400,
                     type: 'donut',
                 },
                 plotOptions: {
@@ -455,7 +446,7 @@
                     breakpoint: 480,
                     options: {
                         chart: {
-                            width: 200
+                            width: 300
                         },
                         legend: {
                             position: 'bottom'
