@@ -87,7 +87,7 @@ return Application::configure(basePath: dirname(__DIR__))
     $schedule->call(function () {
       $salesData = MembershipPlan::with('subscription')->get();
       Mail::to(config('variables.email'))->send(new MailerService($salesData));
-    })->everyMinute();
+    })->monthlyOn(7, '00:00');
   })->withSchedule(function (Schedule $schedule) {
     // Yearly membership plan cleanup - Runs on January 1st at 03:00
     $schedule->call(function () {
