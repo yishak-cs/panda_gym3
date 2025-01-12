@@ -46,7 +46,7 @@ class SendQRCodeEmail implements ShouldQueue
 
             Mail::to($this->sub->member->email)->send(new QRcodeMailer($this->sub));
 
-            Log::info('QR code email sent successfully', [
+            Log::channel('email')->info('QR code email sent successfully', [
                 'member_id' => $this->sub->member->id,
                 'email' => $this->sub->member->email
             ]);

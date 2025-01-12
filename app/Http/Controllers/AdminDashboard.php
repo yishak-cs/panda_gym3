@@ -133,7 +133,7 @@ class AdminDashboard extends Controller
         // Calculate the percentage of current month's revenue compared to last month
         $revenue_percentage = $last_month_revenue > 0
             ? ($current_month_revenue / $last_month_revenue) * 100
-            : 100;
+            : ($current_month_revenue == 0 && $last_month_revenue == 0 ? 0 : 100);
 
         return view('content.Admin.dashboard.AdminDashboard', [
             'bestSellingPlan' => $bestSellingPlan,

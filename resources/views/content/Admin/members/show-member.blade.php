@@ -91,6 +91,10 @@
                             <li class="list-group-item"><strong>Current Weight:</strong> {{ $member->current_weight }} kg
                             </li>
                             <li class="list-group-item"><strong>Target Weight:</strong> {{ $member->target_weight }} kg</li>
+                            @if (!is_null($member->length))
+                                <li class="list-group-item"><strong>BMI </strong>
+                                    {{ round($member->current_weight / pow($member->length, 2), 2) }} kg/m<sup>2</sup></li>
+                            @endif
                         </ul>
                     </div>
                 </div>

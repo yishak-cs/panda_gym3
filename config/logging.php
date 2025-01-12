@@ -133,6 +133,12 @@ return [
       'level' => 'info',
     ],
 
+    'email' => [
+      'driver' => 'single',
+      'path' => storage_path('logs/email.log'),
+      'level' => 'info',
+    ],
+
   ],
 
 ];

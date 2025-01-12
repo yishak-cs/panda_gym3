@@ -26,6 +26,7 @@ class Members extends Model
         'goal',
         'current_weight',
         'target_weight',
+        'length'
     ];
 
     /**

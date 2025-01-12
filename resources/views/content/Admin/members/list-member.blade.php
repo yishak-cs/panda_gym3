@@ -150,12 +150,17 @@
                 <div class="mb-3">
                     <label for="current_weight" class="form-label">Current Weight</label>
                     <input type="number" class="form-control" id="current_weight" name="current_weight"
-                        step="0.1">
+                        step="0.01">
                 </div>
 
                 <div class="mb-3">
                     <label for="target_weight" class="form-label">Target Weight</label>
-                    <input type="number" class="form-control" id="target_weight" name="target_weight" step="0.1">
+                    <input type="number" class="form-control" id="target_weight" name="target_weight" step="0.01">
+                </div>
+
+                <div class="mb-3">
+                    <label for="target_weight" class="form-label">Height</label>
+                    <input type="number" class="form-control" id="length" name="length" step="0.01">
                 </div>
 
                 <div class="mb-3">
@@ -211,6 +216,7 @@
                     $('#email').val(data.email);
                     $('#phone_number').val(data.phone_number);
                     $('#sex').val(data.sex);
+                    $('#length').val(data.length);
                     $('#current_weight').val(data.current_weight);
                     $('#target_weight').val(data.target_weight);
                     $('#goal').val(data.goal);

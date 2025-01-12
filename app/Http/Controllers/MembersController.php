@@ -49,6 +49,7 @@ class MembersController extends Controller
             'email' => 'required|email',
             'phone_number' => 'required',
             'sex' => 'required',
+            'length' => 'numeric|nullable',
             'membership_plan' => 'required',
             'startDate' => 'required|date',
         ]);
@@ -62,6 +63,7 @@ class MembersController extends Controller
                     'email',
                     'phone_number',
                     'sex',
+                    'length',
                     'current_weight',
                     'target_weight',
                     'goal',
@@ -223,6 +225,7 @@ class MembersController extends Controller
             'email' => 'required|string|email|max:255|unique:members,email,' . $member->id,
             'phone_number' => 'required|string|max:255',
             'sex' => 'required|string|in:male,female,other',
+            'length' => 'nullable|numeric',
             'current_weight' => 'nullable|numeric',
             'target_weight' => 'nullable|numeric',
             'goal' => 'nullable|string|max:255',

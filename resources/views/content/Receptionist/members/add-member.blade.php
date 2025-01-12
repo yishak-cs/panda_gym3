@@ -51,13 +51,18 @@
                                 </div>
                                 <div class="input-group input-group-merge mb-3">
                                     <span class="input-group-text"><i class="ri-scales-3-line ri-20px"></i></span>
-                                    <input type="number" name="current_weight" class="form-control"
-                                        placeholder="Current Weight (kg)" />
+                                    <input type="number" step="0.01" name="current_weight" class="form-control"
+                                        placeholder="Current Weight (kg) *" required />
                                 </div>
                                 <div class="input-group input-group-merge mb-3">
                                     <span class="input-group-text"><i class="ri-calendar-line ri-20px"></i></span>
                                     <input type="date" name="startDate" class="form-control" placeholder="Start Date"
                                         min="{{ date('Y-m-d') }}" onchange="validateStartDate(this)" />
+                                </div>
+                                <div class="input-group input-group-merge mb-3">
+                                    <span class="input-group-text"><i class="ri-ruler-line ri-20px"></i></span>
+                                    <input type="number" step="0.01" name="length" class="form-control"
+                                        placeholder="Height (m) *" required />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -78,8 +83,8 @@
                                 </div>
                                 <div class="input-group input-group-merge mb-3">
                                     <span class="input-group-text"><i class="ri-scales-3-line ri-20px"></i></span>
-                                    <input type="number" name="target_weight" class="form-control"
-                                        placeholder="Target Weight (kg)" />
+                                    <input type="number" step="0.01" name="target_weight" class="form-control"
+                                        placeholder="Target Weight (kg) *" required />
                                 </div>
                                 <div class="input-group input-group-merge mb-3">
                                     <span class="input-group-text"><i class="ri-user-line ri-20px"></i></span>
