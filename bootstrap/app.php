@@ -50,7 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
       }
 
       Log::channel('cleanup')->info('#####Finished member cleanup job#####');
-    })->monthlyOn(1, '00:00');
+    })->monthlyOn(3, '17:00');
   })
   ->withSchedule(function (Schedule $schedule) {
     // Quarterly checkins cleanup - Runs on the 1st day of January, April, July, and October at 01:00
@@ -67,7 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
       $logger->info("Deleted {$deletedCount} old checkins");
       $logger->info('#####Finished Checkins cleanup job#####');
-    })->cron('0 1 1 1,4,7,10 *');
+    })->quarterlyOn(7, '17:00');
   })
   ->withSchedule(function (Schedule $schedule) {
     // Yearly subscription cleanup - Runs on January 1st at 02:00
@@ -87,7 +87,7 @@ return Application::configure(basePath: dirname(__DIR__))
     $schedule->call(function () {
       $salesData = MembershipPlan::with('subscription')->get();
       Mail::to(config('variables.email'))->send(new MailerService($salesData));
-    })->monthlyOn(7, '00:00');
+    })->monthlyOn(7, '17:12');
   })->withSchedule(function (Schedule $schedule) {
     // Yearly membership plan cleanup - Runs on January 1st at 03:00
     $schedule->call(function () {
@@ -98,6 +98,6 @@ return Application::configure(basePath: dirname(__DIR__))
       $logger->info("Deleted {$deletedCount} orphaned membership plans");
 
       Log::channel('cleanup')->info('#####Finished Membership Plan cleanup job#####');
-    })->yearlyOn(1, 1, '03:00');
+    })->yearlyOn(1, 7, '17:00');
   })
   ->create();

@@ -167,6 +167,34 @@ class Subscription extends Model
     {
         return $query->where('endDate', '<=', now());
     }
+
+    /**
+     * Check if the subscription is expired
+     * A subscription is considered expired if either:
+     * 1. The end date has passed
+     * 2. The allowed entries have been exhausted (if the plan has entry limits)
+     *
+     * @return bool
+     */
+    public function isExpired(): bool
+    {
+        // Check if end date has passed
+        if ($this->endDate->lte(now())) {
+            return true;
+        }
+
+        // Check if allowed entries have been exhausted (if applicable)
+        if (!is_null($this->membership_plan->allowed_entries)) {
+            $checkinCount = $this->checkins()
+                ->sum('in_times');
+
+            if ($checkinCount >= $this->membership_plan->allowed_entries) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 /**
  * $pendingSubscriptions = Subscription::pending()->get();

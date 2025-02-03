@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 
 class Members extends Model
@@ -83,10 +84,27 @@ class Members extends Model
      */
     public function activeSubscription(): ?Subscription
     {
-        return $this->subscriptions()
+        $subscription = $this->subscriptions()
             ->active()
             ->latest()
             ->first();
+
+        if (!$subscription) {
+            return null;
+        }
+
+        // Check if subscription has exceeded allowed entries
+        if (!is_null($subscription->membership_plan->allowed_entries)) {
+            $checkinCount = $this->checkins()
+                ->where('subscription_id', $subscription->id)
+                ->sum('in_times');
+
+            if ($checkinCount >= $subscription->membership_plan->allowed_entries) {
+                return null;
+            }
+        }
+
+        return $subscription;
     }
 
     /**
@@ -97,10 +115,27 @@ class Members extends Model
      */
     public function getActiveSubscriptionAttribute()
     {
-        return $this->subscriptions()
+        $subscription = $this->subscriptions()
             ->active()
             ->latest()
             ->first();
+
+        if (!$subscription) {
+            return null;
+        }
+
+        // Check if subscription has exceeded allowed entries
+        if (!is_null($subscription->membership_plan->allowed_entries)) {
+            $checkinCount = $this->checkins()
+                ->where('subscription_id', $subscription->id)
+                ->sum('in_times');
+
+            if ($checkinCount >= $subscription->membership_plan->allowed_entries) {
+                return null;
+            }
+        }
+
+        return $subscription;
     }
 
     /**
@@ -115,6 +150,41 @@ class Members extends Model
             ->latest()
             ->first();
     }
+
+    /**
+     * get the user's Expired subscription
+     * 
+     * @return Subscription|null
+     */
+    public function getExpiredSubscriptionAttribute()
+    {
+        $subscription = $this->subscriptions()
+            ->active()
+            ->latest()
+            ->first();
+
+        if (!$subscription) {
+            return null;
+        }
+
+        // Check if subscription has exceeded allowed entries
+        if (!is_null($subscription->membership_plan->allowed_entries)) {
+            $checkinCount = $this->checkins()
+                ->where('subscription_id', $subscription->id)
+                ->sum('in_times');
+            // if it exceeds then the subscription is expired so return
+            if ($checkinCount >= $subscription->membership_plan->allowed_entries) {
+                return $subscription;
+            }
+        }
+
+        return ($this->subscriptions()
+            ->Expired()
+            ->latest()
+            ->first());
+    }
+
+
     /**
      * Checks if the member can check in based on their active subscription.
      * 
@@ -149,5 +219,25 @@ class Members extends Model
         }
 
         return true;
+    }
+
+    /**
+     * Renew or update member's subscription
+     *
+     * @param int $membershipPlanId
+     * @param string|Carbon $startDate
+     * @return Subscription
+     */
+    public function renewSubscription(int $membershipPlanId, $startDate): Subscription
+    {
+        $subscription = new Subscription([
+            'member_id' => $this->id,
+            'membership_plan_id' => $membershipPlanId,
+            'startDate' => Carbon::parse($startDate),
+        ]);
+
+        $subscription->save();
+
+        return $subscription;
     }
 }

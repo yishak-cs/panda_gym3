@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('/api')->group(function () {
         Route::get('/members/{id}', [MembersController::class, 'apiShow']);
         Route::put('/members/{id}', [MembersController::class, 'apiUpdate']);
+        Route::post('/members/{id}/renew-subscription', [MembersController::class, 'apiRenewSubscription']);
     });
 
     Route::middleware('UserAccess:admin')->group(function () {

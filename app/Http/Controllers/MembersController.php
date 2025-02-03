@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Members;
 use App\Models\QRcodes;
+use Illuminate\Support\Arr;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use App\Models\MembershipPlan;
@@ -137,7 +138,7 @@ class MembersController extends Controller
         // Get subscription (active, pending, or expired)
         $subscription = $member->active_subscription
             ?? $member->pending_subscription
-            ?? $member->subscriptions()->expired()->latest()->first();
+            ?? $member->expired_subscription;
 
         if (!$subscription) {
             return redirect()->back()->with('error', 'No subscription found for this member');
@@ -195,21 +196,65 @@ class MembersController extends Controller
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         return redirect()->back()->with('success', 'Member deleted successfully');
     }
-
     /**
-     * Display the form for editing a member.
+     * Display member data and available membership plans
      *
      * @param  int  $id
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Http\Response
      */
     public function apiShow($id)
     {
-        $member = Members::findOrFail($id);
-        return response()->json($member);
+        $member = Members::with(['subscriptions' => function ($query) {
+            $query->with('membership_plan')
+                ->orderBy('startDate', 'desc');
+        }])->findOrFail($id);
+
+        // Get current active subscription if exists
+        $activeSubscription = $member->activeSubscription();
+
+        // Get all membership plans
+        $availablePlans = MembershipPlan::all();
+
+        // Calculate earliest possible start date for new subscription
+        $earliestStartDate = null;
+
+        // Prepare subscription info for response
+        $subscriptionInfo = null;
+        if ($activeSubscription) {
+            // Check if subscription has exceeded allowed entries
+            $checkinCount = 0;
+            $check_ins = $member->checkins()
+                ->where('subscription_id', $activeSubscription->id)
+                ->get();
+            foreach ($check_ins as $check_in) {
+                $checkinCount += $check_in->in_times;
+            }
+
+            $isExpiredByEntries = !is_null($activeSubscription->membership_plan->allowed_entries) &&
+                $checkinCount >= $activeSubscription->membership_plan->allowed_entries;
+
+            if (!$isExpiredByEntries) {
+                $subscriptionInfo = [
+                    'plan_name' => $activeSubscription->membership_plan->name,
+                    'end_date' => $activeSubscription->endDate->format('Y-m-d'),
+                    'entries_used' => $checkinCount,
+                    'entries_allowed' => $activeSubscription->membership_plan->allowed_entries,
+                    'is_limited' => !is_null($activeSubscription->membership_plan->allowed_entries)
+                ];
+                $earliestStartDate = $activeSubscription->endDate->addDay()->format('Y-m-d');
+            }
+        }
+
+        return response()->json([
+            'member' => $member,
+            'subscription_info' => $subscriptionInfo,
+            'available_plans' => $availablePlans,
+            'earliest_start_date' => $earliestStartDate ?? now()->format('Y-m-d')
+        ]);
     }
 
     /**
-     * Update a member.
+     * Update member information
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -219,6 +264,7 @@ class MembersController extends Controller
     {
         $member = Members::findOrFail($id);
 
+        // Validate member data
         $validatedData = $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
@@ -231,9 +277,73 @@ class MembersController extends Controller
             'goal' => 'nullable|string|max:255',
         ]);
 
-        $member->update($validatedData);
+        try {
+            $member->update($validatedData);
 
-        return response()->json(['message' => 'Member updated successfully', 'member' => $member]);
+            return response()->json([
+                'message' => 'Member updated successfully',
+                'member' => $member->fresh()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to update member information'
+            ], 422);
+        }
+    }
+
+    /**
+     * Handle subscription renewal
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function apiRenewSubscription(Request $request, $id)
+    {
+        $member = Members::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'membership_plan' => 'required|exists:membership_plans,id',
+            'startDate' => 'required|date'
+        ]);
+
+        try {
+            $startDate = Carbon::parse($validatedData['startDate']);
+
+            // Check for subscription overlap
+            $activeSubscription = $member->activeSubscription();
+            if ($activeSubscription && $startDate->lte($activeSubscription->endDate)) {
+                throw new \Exception('New subscription cannot overlap with active subscription.');
+            }
+
+            // Check for any future subscriptions that might overlap
+            $futureSubscription = $member->subscriptions()
+                ->where('startDate', '>', now())
+                ->where('startDate', '<=', $startDate)
+                ->first();
+
+            if ($futureSubscription) {
+                throw new \Exception('New subscription conflicts with a pending subscription.');
+            }
+
+            // Create new subscription
+            $subscription = $member->renewSubscription(
+                $validatedData['membership_plan'],
+                $startDate
+            );
+
+            // Dispatch email job with fresh subscription data
+            MailController::sendQRcode($subscription);
+
+            return response()->json([
+                'message' => 'Subscription renewed successfully',
+                'subscription' => $subscription->load('membership_plan')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 422);
+        }
     }
 
     /**

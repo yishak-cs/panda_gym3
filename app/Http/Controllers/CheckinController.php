@@ -21,7 +21,7 @@ class CheckinController extends Controller
                 return redirect()->route('members.show', ['id' => $member_id])->with('error', 'Either You have reached the maximum number of entries for this membership or the Start Date is not due');
             }
 
-            $todayCheckin = $member->checkins()->whereDate('date', Carbon::today())->first();
+            $todayCheckin = $member->activeSubscription()->checkins()->whereDate('date', Carbon::today())->first();
 
             if ($todayCheckin) {
                 $this->updateCheckin($todayCheckin->id);
@@ -44,8 +44,9 @@ class CheckinController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            // Handle decryption errors
-
+            return response()->json([
+                'error' => $e->getMessage()
+            ]);
         }
     }
 

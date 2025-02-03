@@ -30,6 +30,15 @@
                             </div>
                         </div>
                     </div>
+                    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header bg-danger text-white">
+                            <strong class="me-auto">Error</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            An error occurred.
+                        </div>
+                    </div>
                     <div class="card-body">
                         @if (session('error'))
                             <div class="alert alert-danger alert-dismissible" role="alert">
@@ -67,7 +76,17 @@
                                                 <td>{{ $member->id }}</td>
                                                 <td>{{ $member->getName() }}</td>
                                                 <td>{{ $member->email }}</td>
-                                                <td>{{ $member->active_subscription->membership_plan->name ?? ($member->pending_subscription?->membership_plan->name ?? 'null') }}
+                                                <td>
+                                                    @if ($member->active_subscription)
+                                                        <span
+                                                            class="badge rounded-pill bg-success">{{ $member->active_subscription->membership_plan->name }}</span>
+                                                    @elseif($member->pending_subscription)
+                                                        <span
+                                                            class="badge rounded-pill bg-warning">{{ $member->pending_subscription->membership_plan->name }}</span>
+                                                    @else
+                                                        <span class="badge rounded-pill bg-danger">null</span>
+                                                    @endif
+                                                </td>
                                                 </td>
                                                 <td>
                                                     <div class="d-inline-block">
@@ -102,63 +121,109 @@
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body mx-0 flex-grow-0 h-100">
-            <form class="edit-user pt-0 fv-plugins-bootstrap5 fv-plugins-framework" id="editUserForm"
-                novalidate="novalidate">
-                @csrf
-                <input type="hidden" name="id" id="user_id">
+            <!-- Add tabs for User Info and Subscription -->
+            <ul class="nav nav-tabs mb-3" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#user-info" type="button">User
+                        Info</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#subscription"
+                        type="button">Subscription</button>
+                </li>
+            </ul>
 
-                <div class="mb-3">
-                    <label for="firstname" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="firstname" name="firstname" required>
+            <div class="tab-content">
+                <!-- User Info Tab -->
+                <div class="tab-pane fade show active" id="user-info">
+                    <form class="edit-user pt-0 fv-plugins-bootstrap5 fv-plugins-framework" id="editUserForm"
+                        novalidate="novalidate">
+                        @csrf
+                        <input type="hidden" name="id" id="user_id">
+
+                        <div class="mb-3">
+                            <label for="firstname" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lastname" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sex" class="form-label">Sex</label>
+                            <select class="form-select" id="sex" name="sex" required>
+                                <option value="">Select</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="current_weight" class="form-label">Current Weight</label>
+                            <input type="number" class="form-control" id="current_weight" name="current_weight"
+                                step="0.01">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="target_weight" class="form-label">Target Weight</label>
+                            <input type="number" class="form-control" id="target_weight" name="target_weight"
+                                step="0.01">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="target_weight" class="form-label">Height</label>
+                            <input type="number" class="form-control" id="length" name="length" step="0.01">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="goal" class="form-label">Goal</label>
+                            <textarea class="form-control" id="goal" name="goal" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Update Member</button>
+                    </form>
                 </div>
 
-                <div class="mb-3">
-                    <label for="lastname" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lastname" name="lastname" required>
-                </div>
+                <!-- Subscription Tab -->
+                <div class="tab-pane fade" id="subscription">
+                    <!-- Add this div for current subscription info -->
+                    <div id="current-subscription-info" class="mb-3">
+                        <!-- Will be populated dynamically -->
+                    </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
+                    <form class="renew-subscription pt-0" id="renewSubscriptionForm">
+                        @csrf
+                        <input type="hidden" name="id" id="subscription_user_id">
 
-                <div class="mb-3">
-                    <label for="phone_number" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
-                </div>
+                        <div class="mb-3">
+                            <label for="membership_plan" class="form-label">Membership Plan</label>
+                            <select class="form-select" id="membership_plan" name="membership_plan" required>
+                                <option value="">Select Plan</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="sex" class="form-label">Sex</label>
-                    <select class="form-select" id="sex" name="sex" required>
-                        <option value="">Select</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="current_weight" class="form-label">Current Weight</label>
-                    <input type="number" class="form-control" id="current_weight" name="current_weight"
-                        step="0.01">
+                        <button type="submit" class="btn btn-primary">Renew Subscription</button>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label for="target_weight" class="form-label">Target Weight</label>
-                    <input type="number" class="form-control" id="target_weight" name="target_weight" step="0.01">
-                </div>
-
-                <div class="mb-3">
-                    <label for="target_weight" class="form-label">Height</label>
-                    <input type="number" class="form-control" id="length" name="length" step="0.01">
-                </div>
-
-                <div class="mb-3">
-                    <label for="goal" class="form-label">Goal</label>
-                    <textarea class="form-control" id="goal" name="goal" rows="3"></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Update Member</button>
-            </form>
+            </div>
         </div>
     </div>
 @endsection
@@ -192,6 +257,12 @@
                 // Handle form submission via AJAX
                 updateUser();
             });
+
+            // Add handler for subscription form
+            $('#renewSubscriptionForm').on('submit', function(e) {
+                e.preventDefault();
+                renewSubscription();
+            });
         });
 
         function fetchUserData(userId) {
@@ -199,19 +270,83 @@
                 url: '/api/members/' + userId,
                 method: 'GET',
                 success: function(data) {
-                    $('#user_id').val(data.id);
-                    $('#firstname').val(data.firstname);
-                    $('#lastname').val(data.lastname);
-                    $('#email').val(data.email);
-                    $('#phone_number').val(data.phone_number);
-                    $('#sex').val(data.sex);
-                    $('#length').val(data.length);
-                    $('#current_weight').val(data.current_weight);
-                    $('#target_weight').val(data.target_weight);
-                    $('#goal').val(data.goal);
+                    // Populate user info
+                    $('#user_id').val(data.member.id);
+                    $('#subscription_user_id').val(data.member.id);
+                    $('#firstname').val(data.member.firstname);
+                    $('#lastname').val(data.member.lastname);
+                    $('#email').val(data.member.email);
+                    $('#phone_number').val(data.member.phone_number);
+                    $('#sex').val(data.member.sex);
+                    $('#length').val(data.member.length);
+                    $('#current_weight').val(data.member.current_weight);
+                    $('#target_weight').val(data.member.target_weight);
+                    $('#goal').val(data.member.goal);
+
+                    // Populate membership plans
+                    const select = $('#membership_plan');
+                    select.empty();
+                    select.append('<option value="">Select Plan</option>');
+                    data.available_plans.forEach(plan => {
+                        select.append(`<option value="${plan.id}">${plan.name}</option>`);
+                    });
+
+                    // Set minimum date for new subscription
+                    const startDateInput = $('#startDate');
+                    if (data.earliest_start_date) {
+                        startDateInput.attr('min', data.earliest_start_date);
+                        startDateInput.val(data.earliest_start_date);
+                    } else {
+                        startDateInput.attr('min', new Date().toISOString().split('T')[0]);
+                    }
+
+                    // Show subscription info
+                    if (data.subscription_info) {
+                        let entriesInfo = '';
+                        if (data.subscription_info.is_limited) {
+                            entriesInfo =
+                                `<br>Entries: ${data.subscription_info.entries_used}/${data.subscription_info.entries_allowed}`;
+                        }
+
+                        $('#current-subscription-info').html(`
+                            <div class="alert alert-success">
+                                Current Plan: ${data.subscription_info.plan_name}<br>
+                                Ends: ${data.subscription_info.end_date}
+                                ${entriesInfo}
+                            </div>
+                        `);
+                    } else {
+                        $('#current-subscription-info').html(`
+                            <div class="alert alert-warning">
+                                No active subscription
+                            </div>
+                        `);
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error("Error fetching member data:", error);
+                    // Show error message
+                    $('#errorToast .toast-body').text('Error fetching member data');
+                    var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    errorToast.show();
+                }
+            });
+        }
+
+        function fetchMembershipPlans() {
+            $.ajax({
+                url: '/api/membership-plans',
+                method: 'GET',
+                success: function(data) {
+                    const select = $('#membership_plan');
+                    select.empty();
+                    select.append('<option value="">Select Plan</option>');
+                    data.forEach(plan => {
+                        select.append(`<option value="${plan.id}">${plan.name}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching membership plans:", error);
                 }
             });
         }
@@ -238,6 +373,44 @@
                 error: function(xhr, status, error) {
                     console.error("Error updating user:", error);
                     // Handle error (e.g., show error messages to the user)
+                }
+            });
+        }
+
+        function renewSubscription() {
+            var formData = $('#renewSubscriptionForm').serialize();
+            $.ajax({
+                url: '/api/members/' + $('#subscription_user_id').val() + '/renew-subscription',
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    console.log("Subscription renewed successfully:", response);
+                    var offcanvasEditUser = bootstrap.Offcanvas.getInstance(document.getElementById(
+                        'offcanvasEditUser'));
+                    offcanvasEditUser.hide();
+
+                    // Update success toast message
+                    $('#successToast .toast-body').text('Subscription renewed successfully!');
+                    var successToast = new bootstrap.Toast(document.getElementById('successToast'));
+                    successToast.show();
+
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1500);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error renewing subscription:", error);
+
+                    // Show error message to user
+                    let errorMessage = 'Failed to renew subscription';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    }
+
+                    // Update error toast message
+                    $('#errorToast .toast-body').text(errorMessage);
+                    var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    errorToast.show();
                 }
             });
         }

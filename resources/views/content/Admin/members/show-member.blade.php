@@ -128,10 +128,10 @@
                     $days = collect($period);
                 @endphp
 
-                <div class="card mt-4 {{ $subscription->endDate->isPast() ? 'bg-secondary' : '' }}">
+                <div class="card mt-4 {{ $subscription->isExpired() ? 'bg-secondary' : '' }}">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 {{ $subscription->endDate->isPast() ? 'text-white' : '' }}">Check-in Calendar</h5>
-                        @if ($subscription->endDate->isPast())
+                        <h5 class="mb-0 {{ $subscription->isExpired() ? 'text-white' : '' }}">Check-in Calendar</h5>
+                        @if ($subscription->isExpired())
                             <small class="text-white float-end">This Member's Subscription has Expired</small>
                         @endif
                     </div>
@@ -142,7 +142,7 @@
                                     $hasCheckin = isset($checkinData[$day->format('Y-m-d')]);
                                     $checkinCount = $hasCheckin ? $checkinData[$day->format('Y-m-d')]['count'] : 0;
                                     $bgClass = $hasCheckin ? 'bg-primary' : 'bg-secondary';
-                                    if ($subscription->endDate->isPast()) {
+                                    if ($subscription->isExpired()) {
                                         $bgClass = $hasCheckin ? 'bg-info' : 'bg-danger';
                                     }
 
