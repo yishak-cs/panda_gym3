@@ -28,59 +28,56 @@ return Application::configure(basePath: dirname(__DIR__))
   ->withExceptions(function (Exceptions $exceptions) {
     //
   })
-->withSchedule(function (Schedule $schedule) {
-    
+  ->withSchedule(function (Schedule $schedule) {
+
     $memberCleanupTask = function ($runType = 'scheduled') {
-        Log::channel('cleanup')->info("***** Starting member cleanup job ({$runType} run) *****");
-        
-        try {
-            $membersQuery = Members::whereNull('active_subscription')
-                ->whereNull('pending_subscription');
-            
-            $totalCount = $membersQuery->count();
-            Log::channel('cleanup')->info("Found {$totalCount} members eligible for cleanup");
-            
-            if ($totalCount === 0) {
-                Log::channel('cleanup')->info('No members found for cleanup');
-                return;
-            }
-            
-            $deletedCount = 0;
-            
-            $membersQuery->chunk(50, function ($members) use (&$deletedCount) {
-                foreach ($members as $member) {
-                    try {
-                        Log::channel('cleanup')->info("Processing member [{$member->id}, {$member->firstname}]");
-                        
-                        $member->delete();
-                        $deletedCount++;
-                        
-                        Log::channel('cleanup')->info("Successfully deleted member {$member->id}");
-                        
-                    } catch (\Exception $e) {
-                        Log::channel('cleanup')->error("Failed to delete member {$member->id}: " . $e->getMessage());
-                    }
-                }
-            });
-            
-            Log::channel('cleanup')->info("Successfully deleted {$deletedCount} out of {$totalCount} members");
-            
-        } catch (\Exception $e) {
-            Log::channel('cleanup')->error('Member cleanup job failed: ' . $e->getMessage());
+      Log::channel('cleanup')->info("***** Starting member cleanup job ({$runType} run) *****");
+
+      try {
+        $membersQuery = Members::whereDoesntHave('active_subscription')
+          ->whereDoesntHave('pending_subscription');
+
+        $totalCount = $membersQuery->count();
+        Log::channel('cleanup')->info("Found {$totalCount} members eligible for cleanup");
+
+        if ($totalCount === 0) {
+          Log::channel('cleanup')->info('No members found for cleanup');
+          return;
         }
-        
-        Log::channel('cleanup')->info("##### Finished member cleanup job ({$runType} run) #####");
+
+        $deletedCount = 0;
+
+        $membersQuery->chunk(50, function ($members) use (&$deletedCount) {
+          foreach ($members as $member) {
+            try {
+              Log::channel('cleanup')->info("Processing member [{$member->id}, {$member->firstname}]");
+
+              $member->delete();
+              $deletedCount++;
+
+              Log::channel('cleanup')->info("Successfully deleted member {$member->id}");
+            } catch (\Exception $e) {
+              Log::channel('cleanup')->error("Failed to delete member {$member->id}: " . $e->getMessage());
+            }
+          }
+        });
+
+        Log::channel('cleanup')->info("Successfully deleted {$deletedCount} out of {$totalCount} members");
+      } catch (\Exception $e) {
+        Log::channel('cleanup')->error('Member cleanup job failed: ' . $e->getMessage());
+      }
+
+      Log::channel('cleanup')->info("##### Finished member cleanup job ({$runType} run) #####");
     };
-    
+
     $schedule->call(function () use ($memberCleanupTask) {
-        $memberCleanupTask('morning');
+      $memberCleanupTask('morning');
     })->weeklyOn(3, '07:30');
-    
+
     $schedule->call(function () use ($memberCleanupTask) {
-        $memberCleanupTask('evening');
+      $memberCleanupTask('evening');
     })->weeklyOn(3, '18:00');
-    
-})
+  })
   ->withSchedule(function (Schedule $schedule) {
 
     $schedule->call(function () {

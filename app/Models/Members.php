@@ -30,6 +30,17 @@ class Members extends Model
         'length'
     ];
 
+
+
+    protected static function booted()
+    {
+        static::deleted(function ($member) {
+            if ($member->qrCode) {
+                $member->qrCode->delete();
+            }
+        });
+    }
+
     /**
      * get subscription associated with the member
      *
