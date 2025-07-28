@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class QRcodes extends Model
 {
@@ -19,6 +20,16 @@ class QRcodes extends Model
         'member_id',
         'path',
     ];
+
+
+    protected static function booted()
+    {
+        static::deleting(function ($qrCode) {
+            if ($qrCode->path && Storage::disk('public')->exists($qrCode->path)) {
+                Storage::disk('public')->delete($qrCode->path);
+            }
+        });
+    }
 
     /**
      * Get the Member associated with this QRcode
