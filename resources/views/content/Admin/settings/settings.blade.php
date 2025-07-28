@@ -79,7 +79,7 @@
     </div>
     <div class="row gy-6">
         <!-- yearly Overview Chart -->
-        <div class="card h-full col-xl-4 col-md-6">
+        <div class="card h-full col-md-6">
 
             <div class="card-header">
                 <div class="d-flex justify-content-between">
@@ -104,7 +104,7 @@
         </div>
         <!-- End of yearly Overview Chart -->
         <!-- checkintimes bubble chart -->
-        <div class="col-xl-4 col-md-6">
+        <div class=" col-md-6">
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
@@ -129,10 +129,10 @@
         <!-- end of checkintimes bubble chart -->
 
         <!-- Membership Revenue contribution -->
-        <div class="card col-xl-4 col-md-6">
+        <div class="card w-full col-md-6">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
-                    <h5 class="mb-1">Yearly Revenue Overview</h5>
+                    <h5 class="mb-1">Membership Revenue Distribution</h5>
                 </div>
             </div>
 
@@ -415,7 +415,7 @@
                 series: contributionData.map(item => item.value),
                 labels: contributionData.map(item => item.name),
                 chart: {
-                    height: 400,
+                    height: 1000,
                     type: 'donut',
                 },
                 plotOptions: {
@@ -437,10 +437,6 @@
                     formatter: function(val, opts) {
                         return val + " - " + opts.w.globals.series[opts.seriesIndex] + '%';
                     }
-                },
-                title: {
-                    text: 'Membership Plan Revenue Distribution',
-                    align: 'center'
                 },
                 responsive: [{
                     breakpoint: 480,

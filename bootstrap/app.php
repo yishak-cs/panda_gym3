@@ -28,37 +28,65 @@ return Application::configure(basePath: dirname(__DIR__))
   ->withExceptions(function (Exceptions $exceptions) {
     //
   })
-  ->withSchedule(function (Schedule $schedule) {
-    // Monthly member cleanup - Runs on the 1st of each month at 00:00
-    $schedule->call(function () {
-      Log::channel('cleanup')->info('*****Starting member cleanup job*****');
-
-      $members = Members::get();
-      Log::channel('cleanup')->info('Found ' . $members->count() . ' members');
-
-      foreach ($members as $member) {
-        Log::channel('cleanup')->info("Checking member {$member->id}");
-        Log::channel('cleanup')->info("Active subscription: " . ($member->active_subscription ? 'yes' : 'no'));
-        Log::channel('cleanup')->info("Pending subscription: " . ($member->pending_subscription ? 'yes' : 'no'));
-
-        if ($member->active_subscription == null && $member->pending_subscription == null) {
-          Log::channel('cleanup')->info("Deleting member {[$member->id, $member->firstname]}");
-          DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-          $member->delete();
-          DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+->withSchedule(function (Schedule $schedule) {
+    
+    $memberCleanupTask = function ($runType = 'scheduled') {
+        Log::channel('cleanup')->info("***** Starting member cleanup job ({$runType} run) *****");
+        
+        try {
+            $membersQuery = Members::whereNull('active_subscription')
+                ->whereNull('pending_subscription');
+            
+            $totalCount = $membersQuery->count();
+            Log::channel('cleanup')->info("Found {$totalCount} members eligible for cleanup");
+            
+            if ($totalCount === 0) {
+                Log::channel('cleanup')->info('No members found for cleanup');
+                return;
+            }
+            
+            $deletedCount = 0;
+            
+            $membersQuery->chunk(50, function ($members) use (&$deletedCount) {
+                foreach ($members as $member) {
+                    try {
+                        Log::channel('cleanup')->info("Processing member [{$member->id}, {$member->firstname}]");
+                        
+                        $member->delete();
+                        $deletedCount++;
+                        
+                        Log::channel('cleanup')->info("Successfully deleted member {$member->id}");
+                        
+                    } catch (\Exception $e) {
+                        Log::channel('cleanup')->error("Failed to delete member {$member->id}: " . $e->getMessage());
+                    }
+                }
+            });
+            
+            Log::channel('cleanup')->info("Successfully deleted {$deletedCount} out of {$totalCount} members");
+            
+        } catch (\Exception $e) {
+            Log::channel('cleanup')->error('Member cleanup job failed: ' . $e->getMessage());
         }
-      }
-
-      Log::channel('cleanup')->info('#####Finished member cleanup job#####');
-    })->monthlyOn(3, '17:00');
-  })
+        
+        Log::channel('cleanup')->info("##### Finished member cleanup job ({$runType} run) #####");
+    };
+    
+    $schedule->call(function () use ($memberCleanupTask) {
+        $memberCleanupTask('morning');
+    })->weeklyOn(3, '07:30');
+    
+    $schedule->call(function () use ($memberCleanupTask) {
+        $memberCleanupTask('evening');
+    })->weeklyOn(3, '18:00');
+    
+})
   ->withSchedule(function (Schedule $schedule) {
-    // Quarterly checkins cleanup - Runs on the 1st day of January, April, July, and October at 01:00
+
     $schedule->call(function () {
       $logger = Log::channel('cleanup');
       $logger->info('*****Starting Checkins cleanup job*****');
 
-      // Bulk delete for better performance
       $threeMonthsAgo = now()->startOfMonth()->subMonths(3);
       $deletedCount = DB::table('check_ins')
         ->join('subscriptions', 'check_ins.subscription_id', '=', 'subscriptions.id')
@@ -67,7 +95,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
       $logger->info("Deleted {$deletedCount} old checkins");
       $logger->info('#####Finished Checkins cleanup job#####');
-    })->quarterlyOn(7, '17:00');
+    })->cron('30 18 1 1,4,7,10 *');
   })
   ->withSchedule(function (Schedule $schedule) {
     // Yearly subscription cleanup - Runs on January 1st at 02:00
@@ -84,10 +112,12 @@ return Application::configure(basePath: dirname(__DIR__))
       $logger->info('#####Finished subscriptions cleanup job#####');
     })->yearlyOn(1, 1, '02:00');
   })->withSchedule(function (Schedule $schedule) {
-    $schedule->call(function () {
+    $emailTask = function () {
       $salesData = MembershipPlan::with('subscription')->get();
       Mail::to(config('variables.email'))->send(new MailerService($salesData));
-    })->monthlyOn(7, '17:12');
+    };
+    $schedule->call($emailTask)->cron('30 7 * * 1');
+    $schedule->call($emailTask)->cron('30 17 * * 1');
   })->withSchedule(function (Schedule $schedule) {
     // Yearly membership plan cleanup - Runs on January 1st at 03:00
     $schedule->call(function () {
@@ -101,3 +131,5 @@ return Application::configure(basePath: dirname(__DIR__))
     })->yearlyOn(1, 7, '17:00');
   })
   ->create();
+// pandafitness25@gmail.com
+//yishak0907968056

@@ -237,6 +237,18 @@ class AdminDashboard extends Controller
             'checkinPercentage' => $checkinPercentage
         ]);
     }
+
+    public function stats()
+    {
+        $threeMonthsAgo = Carbon::now()->subMonths(2)->startOfMonth();
+        $now = Carbon::now()->endOfMonth();
+        $recentSubscriptions = Subscription::whereBetween('created_at', [$threeMonthsAgo, $now])
+            ->with(['member', 'membership_plan'])
+            ->get();
+        return view('content.Admin.stats.stats', [
+            'recentSubscriptions' => $recentSubscriptions
+        ]);
+    }
 }
 
 /**  $revenue = 0;

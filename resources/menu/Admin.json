@@ -45,6 +45,12 @@
       "name": "Membership Plan",
       "icon": "menu-icon tf-icons ri-file-text-line",
       "slug": "plans"
+    },
+    {
+      "url": "/stats",
+      "name": "Stats",
+      "icon": "menu-icon tf-icons ri-bar-chart-line",
+      "slug": "stats"
     }
   ]
 }
