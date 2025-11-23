@@ -135,10 +135,22 @@ class MembersController extends Controller
         // Eager load relationships to avoid N+1 queries
         $member = Members::findOrFail($id);
 
-        // Get subscription (active, pending, or expired)
+        // Get subscription - try active first, then pending, then most recent subscription
         $subscription = $member->active_subscription
             ?? $member->pending_subscription
-            ?? $member->expired_subscription;
+            ?? $member->subscriptions()
+            ->with('membership_plan')
+            ->where('startDate', '<=', now())
+            ->latest()
+            ->first();
+
+        // If still no subscription, try to get any subscription (including future ones)
+        if (!$subscription) {
+            $subscription = $member->subscriptions()
+                ->with('membership_plan')
+                ->latest()
+                ->first();
+        }
 
         if (!$subscription) {
             return redirect()->back()->with('error', 'No subscription found for this member');
@@ -344,6 +356,116 @@ class MembersController extends Controller
                 'error' => $e->getMessage()
             ], 422);
         }
+    }
+
+    /**
+     * Display members with subscriptions expiring or expired within specified days.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function expiringSoon(Request $request)
+    {
+        // Validate date parameter
+        $validated = $request->validate([
+            'date' => 'nullable|date'
+        ]);
+        
+        // Get date parameter, default to today
+        $targetDate = isset($validated['date']) 
+            ? Carbon::parse($validated['date'])->startOfDay()
+            : Carbon::today()->startOfDay();
+        
+        // Calculate days difference for display purposes
+        $days = $targetDate->diffInDays(Carbon::today()->startOfDay(), false);
+
+        // Get all members with their subscriptions
+        $allMembers = Members::with(['subscriptions.membership_plan', 'checkins'])->get();
+
+        $expiringMembers = collect();
+
+        foreach ($allMembers as $member) {
+            // Get the most recent subscription that was active or is currently active
+            $subscription = $member->subscriptions()
+                ->with('membership_plan')
+                ->where('startDate', '<=', now())
+                ->latest()
+                ->first();
+
+            if (!$subscription) {
+                continue;
+            }
+
+            // Check if expired by entries
+            $checkinCount = 0;
+            $isExpiredByEntries = false;
+            $entriesExhaustionDate = null;
+
+            if (!is_null($subscription->membership_plan->allowed_entries)) {
+                $checkins = $member->checkins()
+                    ->where('subscription_id', $subscription->id)
+                    ->orderBy('date', 'asc')
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                $checkinCount = $checkins->sum('in_times');
+                $isExpiredByEntries = $checkinCount >= $subscription->membership_plan->allowed_entries;
+
+                // If expired by entries, find the date when entries were exhausted
+                if ($isExpiredByEntries) {
+                    $runningTotal = 0;
+                    foreach ($checkins as $checkin) {
+                        $runningTotal += $checkin->in_times;
+                        if ($runningTotal >= $subscription->membership_plan->allowed_entries) {
+                            $entriesExhaustionDate = Carbon::parse($checkin->date);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Check if expired by date
+            $isExpiredByDate = $subscription->endDate->lte(now());
+            $endDate = $subscription->endDate;
+
+            // Determine actual expiration date
+            // If expired by entries, use the date entries were exhausted
+            // Otherwise, use the end_date
+            if ($isExpiredByEntries && $entriesExhaustionDate) {
+                // If expired by entries, use the exhaustion date as the actual expiration date
+                $actualExpirationDate = $entriesExhaustionDate->copy()->startOfDay();
+            } else {
+                // Use end_date for date-based expiration
+                $actualExpirationDate = $endDate->copy()->startOfDay();
+            }
+
+            // Check if expiration date matches target date (exact day match)
+            if ($actualExpirationDate->isSameDay($targetDate)) {
+                // Calculate days difference for display purposes
+                $daysDifference = $actualExpirationDate->diffInDays(now()->startOfDay(), false);
+                $expiringMembers->push([
+                    'member' => $member,
+                    'subscription' => $subscription,
+                    'expiration_date' => $actualExpirationDate,
+                    'expired_by_entries' => $isExpiredByEntries,
+                    'expired_by_date' => $isExpiredByDate,
+                    'checkin_count' => $checkinCount,
+                    'allowed_entries' => $subscription->membership_plan->allowed_entries,
+                    'days_until_expiration' => $daysDifference,
+                    'entries_exhaustion_date' => $entriesExhaustionDate,
+                ]);
+            }
+        }
+
+        // Sort by expiration date
+        $expiringMembers = $expiringMembers->sortBy(function ($item) {
+            return $item['expiration_date']->timestamp;
+        });
+
+        if (Auth::user()->role === 'receptionist') {
+            return view('content.Receptionist.members.expiring-soon', compact('expiringMembers', 'days', 'targetDate'));
+        }
+        return view('content.Admin.members.expiring-soon', compact('expiringMembers', 'days', 'targetDate'));
     }
 
     /**

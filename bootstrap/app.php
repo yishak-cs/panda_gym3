@@ -1,16 +1,14 @@
 <?php
 
 use App\Models\Members;
-use App\Models\CheckIns;
-use App\Mail\MailerService;
 use App\Models\Subscription;
 use App\Models\MembershipPlan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Application;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Http\Middleware\UserAccessMiddleware;
+use App\Jobs\NewJob;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -109,12 +107,13 @@ return Application::configure(basePath: dirname(__DIR__))
       $logger->info('#####Finished subscriptions cleanup job#####');
     })->yearlyOn(1, 1, '02:00');
   })->withSchedule(function (Schedule $schedule) {
-    $emailTask = function () {
-      $salesData = MembershipPlan::with('subscription')->get();
-      Mail::to(config('variables.email'))->send(new MailerService($salesData));
-    };
-    $schedule->call($emailTask)->cron('30 7 * * 1');
-    $schedule->call($emailTask)->cron('30 17 * * 1');
+    $schedule->call(function () {
+      NewJob::dispatch();
+    })->cron('30 7 * * 1,5');
+
+    $schedule->call(function () {
+      NewJob::dispatch();
+    })->cron('0 18 * * 1,5');
   })->withSchedule(function (Schedule $schedule) {
     // Yearly membership plan cleanup - Runs on January 1st at 03:00
     $schedule->call(function () {

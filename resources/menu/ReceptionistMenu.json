@@ -20,6 +20,11 @@
           "url": "/members/list",
           "name": "List",
           "slug": "Members-list"
+        },
+        {
+          "url": "/members/expiring",
+          "name": "Expiring",
+          "slug": "Members-expiring"
         }
       ]
     }

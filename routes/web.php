@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
         });
     });
     Route::get('/checkin/{member_id}', [CheckinController::class, 'processScan'])->name('Checkin');
+    Route::get('/members/expiring', [MembersController::class, 'expiringSoon'])->name('Members-expiring');
 });
 
 Auth::routes();

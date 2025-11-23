@@ -11,13 +11,15 @@ class MailerService extends Mailable
     use Queueable, SerializesModels;
 
     protected $salesData;
+    protected $recentSubscriptions;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($salesData)
+    public function __construct($salesData, $recentSubscriptions)
     {
         $this->salesData = $salesData;
+        $this->recentSubscriptions = $recentSubscriptions;
     }
 
     /**
@@ -28,7 +30,8 @@ class MailerService extends Mailable
         return $this->subject('Monthly Gym Sales Report')
             ->view('emails.monthly')
             ->with([
-                'salesData' => $this->salesData
+                'salesData' => $this->salesData,
+                'recentSubscriptions' => $this->recentSubscriptions
             ]);
     }
 }
