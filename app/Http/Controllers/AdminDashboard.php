@@ -29,8 +29,9 @@ class AdminDashboard extends Controller
         ];
 
         // Get plans with their subscription counts, ordered by count
+        // Using whereHas instead of having for SQLite compatibility
         $bestSellingPlans = MembershipPlan::withCount('subscription')
-            ->having('subscription_count', '>', 0)
+            ->whereHas('subscription')
             ->orderByDesc('subscription_count')
             ->get();
 
@@ -95,23 +96,23 @@ class AdminDashboard extends Controller
             foreach ($days as $day_index => $day_name) {
                 $current_day = $start_day + $day_index;
 
-                // Process current month
-                if ($current_month->startOfMonth()->addDays($current_day)->isPast()) {
-                    $Sub_count['this_month'][$week_num][$day_name] = count(
-                        Subscription::whereDate(
-                            'created_at',
-                            $current_month->startOfMonth()->addDays($current_day)->format('Y-m-d H:i:s')
-                        )->get()
-                    );
+                // Process current month - use copy() to avoid mutating the original Carbon instance
+                $currentDate = $current_month->copy()->startOfMonth()->addDays($current_day);
+                
+                // Include today's data by checking if date is not in the future
+                if ($currentDate->lessThanOrEqualTo(Carbon::now())) {
+                    $Sub_count['this_month'][$week_num][$day_name] = Subscription::whereDate(
+                        'created_at',
+                        $currentDate->format('Y-m-d')
+                    )->count();
                 }
 
-                // Process last month
-                $Sub_count['last_month'][$week_num][$day_name] = count(
-                    Subscription::whereDate(
-                        'created_at',
-                        $last_month->startOfMonth()->addDays($current_day)->format('Y-m-d H:i:s')
-                    )->get()
-                );
+                // Process last month - use copy() here too
+                $lastMonthDate = $last_month->copy()->startOfMonth()->addDays($current_day);
+                $Sub_count['last_month'][$week_num][$day_name] = Subscription::whereDate(
+                    'created_at',
+                    $lastMonthDate->format('Y-m-d')
+                )->count();
             }
         }
         // Calculate last month's total revenue
